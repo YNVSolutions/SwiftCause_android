@@ -4,17 +4,27 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.swiftcause.swiftcause_android.screens.WelcomeScreen
-import com.swiftcause.swiftcause_android.ui.theme.SwiftCause_androidTheme
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            SwiftCause_androidTheme {
-                WelcomeScreen()
-            }
+            val navController = rememberNavController()
+            NavHost(
+                navController = navController,
+                startDestination = "home_screen",
+                builder = {
+                    composable("home_screen"){
+                        WelcomeScreen()
+                    }
+                }
+            )
         }
     }
 }
