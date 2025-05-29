@@ -63,4 +63,9 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.firebaseui:firebase-ui-auth:8.0.2")
 
+    val nav_version = "2.9.0"
+
+    // Jetpack Compose integration
+    implementation("androidx.navigation:navigation-compose:$nav_version")
+
 }
