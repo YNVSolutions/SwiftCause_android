@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "373490483164",
+    "project_id": "swiftcause-app",
+    "storage_bucket": "swiftcause-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:373490483164:android:28c25c380839edf1555919",
+        "android_client_info": {
+          "package_name": "com.swiftcause.swiftcause_android"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "373490483164-o6ggs2k0c6i9a14mgfqtdhv6biucttti.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANxTaqN4a3Cp5Jj0lRJi8N_-jpNyDVoEk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "373490483164-o6ggs2k0c6i9a14mgfqtdhv6biucttti.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
