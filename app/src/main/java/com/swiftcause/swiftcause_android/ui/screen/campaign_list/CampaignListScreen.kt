@@ -1,4 +1,4 @@
-package com.swiftcause.swiftcause_android.screens
+package com.swiftcause.swiftcause_android.ui.screen.campaign_list
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,9 +9,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 
 @Composable
-fun HomeScreen(navController: NavController, name : String){
+fun CampaignListScreen(navController: NavController, name : String){
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-        Text("Hello $name")
+        Text("Hello $name (campaign screen)")
     }
 }
