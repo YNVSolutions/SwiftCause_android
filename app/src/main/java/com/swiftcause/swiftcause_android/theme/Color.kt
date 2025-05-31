@@ -1,4 +1,4 @@
-package com.swiftcause.swiftcause_android.ui.theme
+package com.swiftcause.swiftcause_android.theme
 
 import androidx.compose.ui.graphics.Color
 
