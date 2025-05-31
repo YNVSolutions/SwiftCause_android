@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
@@ -44,7 +45,7 @@ fun LoginScreen(navController: NavController) {
         verticalArrangement = Arrangement.SpaceAround,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Welcome to SwiftCause (welcome screen)")
+        Text("Welcome to SwiftCause", fontSize = 24.sp)
         Button(onClick = {
             val provider = arrayListOf(
                 AuthUI.IdpConfig.GoogleBuilder().build(),
@@ -59,7 +60,7 @@ fun LoginScreen(navController: NavController) {
 
             launcher.launch(signInIntent)
         }) {
-            Text("Sign in")
+            Text("Sign in", fontSize = 16.sp)
         }
     }
 }
