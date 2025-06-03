@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -26,43 +27,59 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.swiftcause.swiftcause_android.ui.navigation.Routes
+import com.swiftcause.swiftcause_android.ui.screen.welcome.AuthState
+import com.swiftcause.swiftcause_android.ui.screen.welcome.AuthViewModel
 
 @Composable
 fun CampaignListScreen(
     navController: NavController,
     name: String,
-    viewModel: CampaignListViewModel = CampaignListViewModel()
+    viewModel: CampaignListViewModel = CampaignListViewModel(),
+    authViewModel : AuthViewModel = AuthViewModel(),
+    onLogoutRedirect: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    Column(modifier = Modifier.fillMaxSize().padding(top = 40.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("Hello $name", fontSize = 24.sp)
+    val context = LocalContext.current
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 40.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+       Heading(authViewModel, onLogoutRedirect)
         Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 10.dp),
-        contentAlignment = Alignment.Center
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 10.dp),
+            contentAlignment = Alignment.Center
         ) {
-        when {
-            uiState.isLoading -> CircularProgressIndicator()
-            else -> LazyColumn {
-                items(uiState.campaigns) { campaign ->
-                    CampaignCard(
-                        title = campaign.title,
-                        description = campaign.description,
-                        goalAmount = campaign.goalAmount,
-                        tags = campaign.tags
-                    )
+            when {
+                uiState.isLoading -> CircularProgressIndicator()
+                else -> LazyColumn {
+                    items(uiState.campaigns) { campaign ->
+                        CampaignCard(
+                            title = campaign.title,
+                            description = campaign.description,
+                            goalAmount = campaign.goalAmount,
+                            tags = campaign.tags,
+                            navController = navController,
+                            campId = campaign.id
 
+                        )
+
+                    }
                 }
             }
         }
-    }
     }
 
 
@@ -76,13 +93,18 @@ fun CampaignCard(
     description: String?,
     goalAmount: Double,
     tags: List<String>,
-    modifier: Modifier = Modifier
+    navController: NavController,
+    campId : String,
+    modifier: Modifier = Modifier,
+
 ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clickable {},
+            .clickable {
+                navController.navigate(Routes.campaignDetailsScreen + "/${campId}")
+            },
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
@@ -131,13 +153,27 @@ fun CampaignCard(
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun CampaignCardPreview() {
-    CampaignCard(
-        title = "Save the Forests",
-        description = "We're raising funds to protect endangered rainforests and plant new trees across the globe.",
-        goalAmount = 5000.0,
-        tags = listOf("Environment", "Urgent", "TreePlanting")
-    )
+fun Heading(authViewModel: AuthViewModel = viewModel(),onLogoutRedirect: () -> Unit ) {
+    val authState by authViewModel.authState.collectAsState()
+    val context = LocalContext.current
+    Column(
+        modifier = Modifier.padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        when (authState) {
+            is AuthState.Authenticated -> {
+                val user = (authState as AuthState.Authenticated).user.currentUser
+                Text("Welcome, ${user?.displayName ?: user?.email}!")
+                Button(onClick = { authViewModel.signOut(context) }) {
+                    Text("Sign Out")
+                }
+
+            }
+            else -> {
+                onLogoutRedirect()
+            }
+        }
+    }
 }

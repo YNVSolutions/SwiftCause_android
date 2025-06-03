@@ -62,7 +62,10 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.14.0"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
-    implementation("com.firebaseui:firebase-ui-auth:8.0.2")
+    implementation("com.firebaseui:firebase-ui-auth:9.0.0") // Use the latest FirebaseUI Auth
+
+    // Google Play Services Auth (required for Google Sign-In with FirebaseUI)
+    implementation("com.google.android.gms:play-services-auth:21.0.0")
 
     val nav_version = "2.9.0"
 

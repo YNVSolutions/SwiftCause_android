@@ -4,8 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.swiftcause.swiftcause_android.ui.screen.campaign_details.CampaignDetailsScreen
 import com.swiftcause.swiftcause_android.ui.screen.welcome.LoginScreen
 import com.swiftcause.swiftcause_android.ui.screen.campaign_list.CampaignListScreen
+import com.swiftcause.swiftcause_android.ui.screen.payment_options.PaymentOptionsScreen
 
 
 @Composable
@@ -17,12 +19,21 @@ fun NavController(){
         builder = {
 
             composable(Routes.loginScreen){
-                LoginScreen(navController)
+                LoginScreen(navController = navController)
             }
 
             composable(Routes.campaignListScreen + "/{name}"){
                 val name = it.arguments?.getString("name")
-                CampaignListScreen(navController, name?:"User")
+                CampaignListScreen(navController, name?:"User", onLogoutRedirect = { navController.navigate(Routes.loginScreen) { popUpTo(Routes.loginScreen) { inclusive = true } } })
+            }
+
+            composable(Routes.campaignDetailsScreen + "/{campId}"){
+                val campId = it.arguments?.getString("campId")
+                CampaignDetailsScreen(navController, campId?:"null")
+            }
+
+            composable(Routes.paymentOptionsScreen){
+                PaymentOptionsScreen()
             }
         }
     )

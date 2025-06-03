@@ -8,6 +8,7 @@ enum class CampaignStatus {
 }
 
 data class Campaign(
+    val id: String,  // to be mapped explicitly as it is the auto generated key or id of the firestore document
     val title: String = "This is a mock title",
     val description: String? = null,
     val goalAmount: Double = 0.0,
