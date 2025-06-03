@@ -8,6 +8,7 @@ import java.time.ZonedDateTime
 object MockCampaignData {
     val campaigns = listOf(
         Campaign(
+            id = "123",
             title = "Plant 1000 Trees",
             description = "Join us to plant trees across the city.",
             goalAmount = 10000.0,
@@ -24,6 +25,7 @@ object MockCampaignData {
             lastUpdated = LocalDateTime.now()
         ),
         Campaign(
+            id = "234",
             title = "Girls' Education Fund",
             description = "Support rural girls with education essentials.",
             goalAmount = 5000.0,
@@ -40,6 +42,7 @@ object MockCampaignData {
             lastUpdated = LocalDateTime.now().minusDays(1)
         ),
         Campaign(
+            id = "345",
             title = "COVID Relief",
             description = "Help families with essential supplies.",
             goalAmount = 20000.0,
@@ -56,6 +59,7 @@ object MockCampaignData {
             lastUpdated = LocalDateTime.now()
         ),
         Campaign(
+            id = "456",
             title = "Plant 1000 Trees",
             description = "Join us to plant trees across the city.",
             goalAmount = 10000.0,
@@ -72,6 +76,7 @@ object MockCampaignData {
             lastUpdated = LocalDateTime.now()
         ),
         Campaign(
+            id = "567",
             title = "COVID Relief",
             description = "Help families with essential supplies.",
             goalAmount = 20000.0,
@@ -88,6 +93,7 @@ object MockCampaignData {
             lastUpdated = LocalDateTime.now()
         ),
         Campaign(
+            id = "678",
             title = "Girls' Education Fund",
             description = "Support rural girls with education essentials.",
             goalAmount = 5000.0,
@@ -103,6 +109,7 @@ object MockCampaignData {
             donationCount = 85,
             lastUpdated = LocalDateTime.now().minusDays(1)
         ),Campaign(
+            id = "789",
             title = "Girls' Education Fund",
             description = "Support rural girls with education essentials.",
             goalAmount = 5000.0,
