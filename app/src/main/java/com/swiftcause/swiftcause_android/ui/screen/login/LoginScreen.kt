@@ -1,6 +1,5 @@
-package com.swiftcause.swiftcause_android.ui.screen.welcome
+package com.swiftcause.swiftcause_android.ui.screen.login
 
-import android.app.Activity
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Arrangement

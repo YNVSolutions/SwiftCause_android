@@ -1,17 +1,14 @@
-package com.swiftcause.swiftcause_android.ui.screen.welcome
+package com.swiftcause.swiftcause_android.ui.screen.login
 
 import android.app.Activity
-import android.app.Application
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.firebase.ui.auth.AuthUI
-import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
-import com.swiftcause.swiftcause_android.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
