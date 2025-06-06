@@ -27,10 +27,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.swiftcause.swiftcause_android.ui.navigation.Routes
 
 @Composable
-fun PaymentOptionsScreen() {
-    val donationOptions = listOf("£5", "£10", "£25", "£50")
+fun PaymentOptionsScreen(navController: NavController, campId : String) {
+    val currencySign = "£"
+    val donationOptions = listOf("5", "10", "25", "50")
     var selectedOption by remember { mutableStateOf<String?>(null) }
     var customAmount by remember { mutableStateOf("") }
     val context = LocalContext.current
@@ -62,7 +65,7 @@ fun PaymentOptionsScreen() {
                     border = BorderStroke(1.dp, Color.Gray)
                 ) {
                     Text(
-                        text = amount,
+                        text = currencySign + amount,
                         modifier = Modifier.padding(vertical = 20.dp),
                         fontSize = MaterialTheme.typography.headlineMedium.fontSize
                     )
@@ -94,9 +97,10 @@ fun PaymentOptionsScreen() {
         Button(
 
             onClick = {
-                val donationAmount = selectedOption ?: "£$customAmount"
+                val donationAmount = selectedOption ?: customAmount
                 // Handle the donation logic here
-                Toast.makeText(context, donationAmount, Toast.LENGTH_SHORT).show()
+//                Toast.makeText(context, donationAmount, Toast.LENGTH_SHORT).show()
+                navController.navigate(Routes.dummyPaymentScreen + "/$campId/$donationAmount")
             },
             modifier = Modifier
                 .fillMaxWidth()

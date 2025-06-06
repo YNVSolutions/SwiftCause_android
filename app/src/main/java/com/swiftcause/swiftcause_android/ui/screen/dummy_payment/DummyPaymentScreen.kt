@@ -1,0 +1,22 @@
+package com.swiftcause.swiftcause_android.ui.screen.dummy_payment
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+
+@Composable
+fun DummyPaymentScreen(campId: String, amount: String) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.SpaceAround,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("Paying £$amount to campId: $campId")
+        Button(onClick = {}) { Text("payment_success") }
+    }
+}

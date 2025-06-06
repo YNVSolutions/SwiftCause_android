@@ -5,4 +5,5 @@ object Routes {
     val loginScreen = "login_screen"
     val campaignDetailsScreen = "campaign_details_screen"
     val paymentOptionsScreen = "payment_options_screen"
+    val dummyPaymentScreen = "dummy_payment_screen"
 }
