@@ -7,33 +7,51 @@ import androidx.navigation.compose.rememberNavController
 import com.swiftcause.swiftcause_android.ui.screen.campaign_details.CampaignDetailsScreen
 import com.swiftcause.swiftcause_android.ui.screen.welcome.LoginScreen
 import com.swiftcause.swiftcause_android.ui.screen.campaign_list.CampaignListScreen
+import com.swiftcause.swiftcause_android.ui.screen.dummy_payment.DummyPaymentScreen
 import com.swiftcause.swiftcause_android.ui.screen.payment_options.PaymentOptionsScreen
 
 
 @Composable
-fun NavController(){
+fun NavController() {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
         startDestination = Routes.loginScreen,
         builder = {
 
-            composable(Routes.loginScreen){
+            composable(Routes.loginScreen) {
                 LoginScreen(navController = navController)
             }
 
-            composable(Routes.campaignListScreen + "/{name}"){
+            composable(Routes.campaignListScreen + "/{name}") {
                 val name = it.arguments?.getString("name")
-                CampaignListScreen(navController, name?:"User", onLogoutRedirect = { navController.navigate(Routes.loginScreen) { popUpTo(Routes.loginScreen) { inclusive = true } } })
+                CampaignListScreen(
+                    navController,
+                    name ?: "User",
+                    onLogoutRedirect = {
+                        navController.navigate(Routes.loginScreen) {
+                            popUpTo(Routes.loginScreen) {
+                                inclusive = true
+                            }
+                        }
+                    })
             }
 
-            composable(Routes.campaignDetailsScreen + "/{campId}"){
+            composable(Routes.campaignDetailsScreen + "/{campId}") {
                 val campId = it.arguments?.getString("campId")
-                CampaignDetailsScreen(navController, campId?:"null")
+                CampaignDetailsScreen(navController, campId ?: "null")
             }
 
-            composable(Routes.paymentOptionsScreen){
-                PaymentOptionsScreen()
+            composable(Routes.paymentOptionsScreen + "/{campId}") {
+                val campId = it.arguments?.getString("campId")
+                PaymentOptionsScreen(navController, campId ?: "null")
+
+            }
+
+            composable(Routes.dummyPaymentScreen + "/{campId}/{amount}"){
+                val campId = it.arguments?.getString("campId")
+                val amount = it.arguments?.getString("amount")
+                DummyPaymentScreen(campId?:"null", amount?:"default_amt")
             }
         }
     )

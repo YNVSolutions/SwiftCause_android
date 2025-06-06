@@ -23,7 +23,7 @@ fun CampaignDetailsScreen(navController: NavController, campId : String){
         Button(onClick = {
 //            navController.navigate() //navigate to the payment options selection screen
 //            Toast.makeText()
-            navController.navigate(Routes.paymentOptionsScreen)
+            navController.navigate(Routes.paymentOptionsScreen + "/$campId")
         }) {
             Text("Donate")
         }
