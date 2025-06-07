@@ -30,14 +30,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.swiftcause.swiftcause_android.ui.navigation.Routes
-import com.swiftcause.swiftcause_android.ui.screen.welcome.AuthState
-import com.swiftcause.swiftcause_android.ui.screen.welcome.AuthViewModel
+import com.swiftcause.swiftcause_android.ui.screen.login.AuthUiState
+import com.swiftcause.swiftcause_android.ui.screen.login.AuthViewModel
 
 @Composable
 fun CampaignListScreen(
@@ -155,7 +153,7 @@ fun CampaignCard(
 
 @Composable
 fun Heading(authViewModel: AuthViewModel = viewModel(),onLogoutRedirect: () -> Unit ) {
-    val authState by authViewModel.authState.collectAsState()
+    val authState by authViewModel.authUiState.collectAsState()
     val context = LocalContext.current
     Column(
         modifier = Modifier.padding(16.dp),
@@ -163,8 +161,8 @@ fun Heading(authViewModel: AuthViewModel = viewModel(),onLogoutRedirect: () -> U
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         when (authState) {
-            is AuthState.Authenticated -> {
-                val user = (authState as AuthState.Authenticated).user.currentUser
+            is AuthUiState.Authenticated -> {
+                val user = (authState as AuthUiState.Authenticated).user.currentUser
                 Text("Welcome, ${user?.displayName ?: user?.email}!")
                 Button(onClick = { authViewModel.signOut(context) }) {
                     Text("Sign Out")

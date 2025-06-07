@@ -1,6 +1,5 @@
-package com.swiftcause.swiftcause_android.ui.screen.welcome
+package com.swiftcause.swiftcause_android.ui.screen.login
 
-import android.app.Activity
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Arrangement
@@ -28,7 +27,7 @@ fun LoginScreen(
 //    onLoginSuccess: () -> Unit
     navController: NavController
 ) {
-    val authState by authViewModel.authState.collectAsState()
+    val authState by authViewModel.authUiState.collectAsState()
     val context = LocalContext.current
 
     // Launcher for FirebaseUI
@@ -42,25 +41,23 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         when (authState) {
-            AuthState.Unauthenticated -> {
+            AuthUiState.Unauthenticated -> {
                 Button(onClick = {
                     authViewModel.launchFirebaseAuthUI(signInLauncher)
                 }) {
                     Text("Login with Firebase")
                 }
 
-                if (authState is AuthState.Error) {
-                    val errorMessage = (authState as AuthState.Error).message
+                if (authState is AuthUiState.Error) {
+                    val errorMessage = (authState as AuthUiState.Error).message
                     Text("Error: $errorMessage", color = androidx.compose.ui.graphics.Color.Red)
                 }
             }
-            AuthState.Authenticating -> {
+            AuthUiState.Authenticating -> {
                 CircularProgressIndicator()
                 Text("Authenticating...")
             }
-            is AuthState.Authenticated -> {
-                // If authenticated, navigate to the main content
-                // This will trigger the onLoginSuccess callback in your NavHost
+            is AuthUiState.Authenticated -> {
                 navController.navigate(Routes.campaignListScreen + "/jitesh")
                 Toast.makeText(context, "Logged in successfully!", Toast.LENGTH_SHORT).show()
             }
