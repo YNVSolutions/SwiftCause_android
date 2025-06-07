@@ -13,29 +13,22 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-sealed class AuthState {
-    object Unauthenticated : AuthState()
-    object Authenticating : AuthState()
-    data class Authenticated(val user: FirebaseAuth) : AuthState()
-    data class Error(val message: String?) : AuthState()
-}
-
 class AuthViewModel : ViewModel() {
 
-    private val _authState = MutableStateFlow<AuthState>(AuthState.Unauthenticated)
-    val authState: StateFlow<AuthState> = _authState
+    private val _authUiState = MutableStateFlow<AuthUiState>(AuthUiState.Unauthenticated)
+    val authUiState: StateFlow<AuthUiState> = _authUiState
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
     init {
         // Check if user is already signed in on app start
         auth.currentUser?.let { user ->
-            _authState.value = AuthState.Authenticated(auth)
+            _authUiState.value = AuthUiState.Authenticated(auth)
         }
     }
 
     fun launchFirebaseAuthUI(launcher: ActivityResultLauncher<Intent>) {
-        _authState.value = AuthState.Authenticating
+        _authUiState.value = AuthUiState.Authenticating
 
         val providers = arrayListOf(
             AuthUI.IdpConfig.EmailBuilder().build(),
@@ -55,17 +48,17 @@ class AuthViewModel : ViewModel() {
             // Successfully signed in
             val user = auth.currentUser
             if (user != null) {
-                _authState.value = AuthState.Authenticated(auth)
+                _authUiState.value = AuthUiState.Authenticated(auth)
 
             } else {
-                _authState.value = AuthState.Error("Authentication successful, but user is null.")
+                _authUiState.value = AuthUiState.Error("Authentication successful, but user is null.")
             }
         } else {
             // Sign in failed. If response is null the user canceled the
             // sign-in flow using the back button. Otherwise check
             // response.getError().getErrorCode() and handle the error.
             val error = result?.error
-            _authState.value = AuthState.Error(error?.message ?: "Sign-in cancelled or unknown error.")
+            _authUiState.value = AuthUiState.Error(error?.message ?: "Sign-in cancelled or unknown error.")
         }
     }
     fun signOut(context : Context) {
@@ -75,9 +68,9 @@ class AuthViewModel : ViewModel() {
                 .signOut(context) // Correct way to sign out
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        _authState.value = AuthState.Unauthenticated
+                        _authUiState.value = AuthUiState.Unauthenticated
                     } else {
-                        _authState.value = AuthState.Error("Sign out failed: ${task.exception?.message}")
+                        _authUiState.value = AuthUiState.Error("Sign out failed: ${task.exception?.message}")
                     }
                 }
         }

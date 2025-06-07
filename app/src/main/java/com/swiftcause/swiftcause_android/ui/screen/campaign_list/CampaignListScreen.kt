@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.swiftcause.swiftcause_android.ui.navigation.Routes
-import com.swiftcause.swiftcause_android.ui.screen.login.AuthState
+import com.swiftcause.swiftcause_android.ui.screen.login.AuthUiState
 import com.swiftcause.swiftcause_android.ui.screen.login.AuthViewModel
 
 @Composable
@@ -153,7 +153,7 @@ fun CampaignCard(
 
 @Composable
 fun Heading(authViewModel: AuthViewModel = viewModel(),onLogoutRedirect: () -> Unit ) {
-    val authState by authViewModel.authState.collectAsState()
+    val authState by authViewModel.authUiState.collectAsState()
     val context = LocalContext.current
     Column(
         modifier = Modifier.padding(16.dp),
@@ -161,8 +161,8 @@ fun Heading(authViewModel: AuthViewModel = viewModel(),onLogoutRedirect: () -> U
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         when (authState) {
-            is AuthState.Authenticated -> {
-                val user = (authState as AuthState.Authenticated).user.currentUser
+            is AuthUiState.Authenticated -> {
+                val user = (authState as AuthUiState.Authenticated).user.currentUser
                 Text("Welcome, ${user?.displayName ?: user?.email}!")
                 Button(onClick = { authViewModel.signOut(context) }) {
                     Text("Sign Out")
