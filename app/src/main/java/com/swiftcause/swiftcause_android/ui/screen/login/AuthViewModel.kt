@@ -9,16 +9,21 @@ import androidx.lifecycle.viewModelScope
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class AuthViewModel : ViewModel() {
+@HiltViewModel
+class AuthViewModel @Inject constructor(
+    private val auth : FirebaseAuth
+) : ViewModel() {
 
     private val _authUiState = MutableStateFlow<AuthUiState>(AuthUiState.Unauthenticated)
     val authUiState: StateFlow<AuthUiState> = _authUiState
 
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+//    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
     init {
         // Check if user is already signed in on app start
