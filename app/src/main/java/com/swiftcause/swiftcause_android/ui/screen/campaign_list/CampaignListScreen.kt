@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.swiftcause.swiftcause_android.ui.navigation.Routes
@@ -41,8 +42,8 @@ import com.swiftcause.swiftcause_android.ui.screen.login.AuthViewModel
 fun CampaignListScreen(
     navController: NavController,
     name: String,
-    viewModel: CampaignListViewModel = CampaignListViewModel(),
-    authViewModel : AuthViewModel = AuthViewModel(),
+    viewModel: CampaignListViewModel = hiltViewModel(),
+    authViewModel : AuthViewModel = hiltViewModel(),
     onLogoutRedirect: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -152,7 +153,7 @@ fun CampaignCard(
 }
 
 @Composable
-fun Heading(authViewModel: AuthViewModel = viewModel(),onLogoutRedirect: () -> Unit ) {
+fun Heading(authViewModel: AuthViewModel,onLogoutRedirect: () -> Unit ) {
     val authState by authViewModel.authUiState.collectAsState()
     val context = LocalContext.current
     Column(

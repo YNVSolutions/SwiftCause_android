@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
@@ -23,7 +24,7 @@ import com.swiftcause.swiftcause_android.ui.navigation.Routes
 
 @Composable
 fun LoginScreen(
-    authViewModel: AuthViewModel = viewModel(),
+    authViewModel: AuthViewModel = hiltViewModel(),
 //    onLoginSuccess: () -> Unit
     navController: NavController
 ) {
