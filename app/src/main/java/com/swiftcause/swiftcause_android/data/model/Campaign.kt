@@ -4,25 +4,26 @@ import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
 enum class CampaignStatus {
-    ACTIVE, COMPLETED, PAUSED
+    active, complete, paused  // should be all caps but as the data in firebase currently has lowercase, using this for testing
 }
 
 data class Campaign(
-    val id: String,  // to be mapped explicitly as it is the auto generated key or id of the firestore document
+    // id set to zero temporarily for testing
+    val id: String = "000",  // to be mapped explicitly as it is the auto generated key or id of the firestore document
     val title: String = "This is a mock title",
     val description: String? = null,
     val goalAmount: Double = 0.0,
     val collectedAmount: Double = 0.0,
     val currency: String = "USD",
-    val status: CampaignStatus = CampaignStatus.ACTIVE,
-    val startDate: ZonedDateTime? = null,
-    val endDate: ZonedDateTime? = null,
+    val status: String = "active", // use enum later
+    val startDate: String? = null,
+    val endDate: String? = null,
     val coverImageUrl: String? = null,
     val createdBy: String? = null,
     val tags: List<String> = emptyList(),
     val giftAidEnabled: Boolean = false,
     val donationCount: Int = 0,
-    val lastUpdated: LocalDateTime? = null
+    val lastUpdated: String? = null
 )
 /*
 Sample data for reference
