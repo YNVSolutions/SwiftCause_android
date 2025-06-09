@@ -22,6 +22,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -37,6 +38,7 @@ import androidx.navigation.NavController
 import com.swiftcause.swiftcause_android.ui.navigation.Routes
 import com.swiftcause.swiftcause_android.ui.screen.login.AuthUiState
 import com.swiftcause.swiftcause_android.ui.screen.login.AuthViewModel
+import com.swiftcause.swiftcause_android.ui.shared.SharedViewModel
 
 @Composable
 fun CampaignListScreen(
@@ -44,10 +46,14 @@ fun CampaignListScreen(
     name: String,
     viewModel: CampaignListViewModel = hiltViewModel(),
     authViewModel : AuthViewModel = hiltViewModel(),
+    sharedViewModel : SharedViewModel = hiltViewModel(),
     onLogoutRedirect: () -> Unit
 ) {
+    LaunchedEffect(Unit) {
+        viewModel.observeShared(sharedViewModel)
+    }
     val uiState by viewModel.uiState.collectAsState()
-    val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
