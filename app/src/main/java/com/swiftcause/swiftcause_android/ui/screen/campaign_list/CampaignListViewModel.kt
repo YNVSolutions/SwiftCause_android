@@ -34,24 +34,32 @@ class CampaignListViewModel @Inject constructor() : ViewModel() {
 //        )
 //    }
 
-    fun fetchCampaigns(viewModel : SharedViewModel){
-        Log.i("FirestoreTag", "Size of fetched campaigns: ${viewModel.campaigns.value.size}")
-        _uiState.value = _uiState.value.copy(isLoading = true)
-        _uiState.value = _uiState.value.copy(
-            campaigns = viewModel.campaigns.value,
-            isLoading = false
-        )
-    }
+//    fun fetchCampaigns(viewModel : SharedViewModel){
+//        Log.i("FirestoreTag", "Size of fetched campaigns: ${viewModel.campaigns.value.size}")
+//        _uiState.value = _uiState.value.copy(isLoading = true)
+//        _uiState.value = _uiState.value.copy(
+//            campaigns = viewModel.campaigns.value,
+//            isLoading = false
+//        )
+//    }
 
-    fun observeShared(viewModel : SharedViewModel){
+    fun observeShared(sharedViewModel : SharedViewModel){
+//        _uiState.value = _uiState.value.copy(isLoading = true)
         viewModelScope.launch {
-            viewModel.campaigns.collect{ list ->
+            sharedViewModel.sharedUiState.collect { sharedState ->
                 _uiState.value = _uiState.value.copy(
-                    campaigns = list,
-                    isLoading = false
+                    isLoading = sharedState.isLoading,
+                    campaigns = sharedState.campaigns,
+                    error = sharedState.error
                 )
-
             }
+//            viewModel.campaigns.collect{ list ->
+//                _uiState.value = _uiState.value.copy(
+//                    campaigns = list,
+//                    isLoading = false
+//                )
+
+//            }
         }
     }
 }

@@ -9,6 +9,7 @@ import com.swiftcause.swiftcause_android.data.repository.CampaignRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -18,16 +19,25 @@ class SharedViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _campaigns = MutableStateFlow<List<Campaign>>(emptyList())
-    val campaigns : StateFlow<List<Campaign>> = _campaigns
+    val campaigns: StateFlow<List<Campaign>> = _campaigns
+
+    private val _sharedUiState = MutableStateFlow(SharedUiState())
+    val sharedUiState: StateFlow<SharedUiState> = _sharedUiState.asStateFlow()
 
     init {
         Log.i("Shared_vm", "Shared viewModel started")
+        _sharedUiState.value = _sharedUiState.value.copy(isLoading = true)
         viewModelScope.launch {
             try {
-                _campaigns.value = repository.fetchCampaigns()
-                Log.i("FirestoreTag", "in shared vm : ${_campaigns.value.size}")
+//                _campaigns.value = repository.fetchCampaigns()
+                _sharedUiState.value = _sharedUiState.value.copy(
+                    campaigns = repository.fetchCampaigns(),
+                    isLoading = false
+                )
+//                Log.i("FirestoreTag", "in shared vm : ${_campaigns.value.size}")
             } catch (e: Exception) {
                 Log.e("Shared_vm", "Error fetching campaigns", e)
+                _sharedUiState.value = _sharedUiState.value.copy(error = e.message)
             }
         }
     }
