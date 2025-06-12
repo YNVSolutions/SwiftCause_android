@@ -18,8 +18,8 @@ class SharedViewModel @Inject constructor(
     private val repository: CampaignRepository
 ) : ViewModel() {
 
-    private val _campaigns = MutableStateFlow<List<Campaign>>(emptyList())
-    val campaigns: StateFlow<List<Campaign>> = _campaigns
+//    private val _campaigns = MutableStateFlow<List<Campaign>>(emptyList())
+//    val campaigns: StateFlow<List<Campaign>> = _campaigns
 
     private val _sharedUiState = MutableStateFlow(SharedUiState())
     val sharedUiState: StateFlow<SharedUiState> = _sharedUiState.asStateFlow()

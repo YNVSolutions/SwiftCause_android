@@ -7,19 +7,22 @@ import com.swiftcause.swiftcause_android.data.model.Campaign
 import jakarta.inject.Inject
 import kotlinx.coroutines.tasks.await
 
-class CampaignRepository(){
-    private val db : FirebaseFirestore = FirebaseFirestore.getInstance()
+class CampaignRepository() {
+    private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val campaignCollection = db.collection("campaigns")
 
-    suspend fun fetchCampaigns() : List<Campaign>{
-        return try{
+    suspend fun fetchCampaigns(): List<Campaign> {
+        return try {
             val snapshot = campaignCollection.get().await()
 
-            val campaigns = snapshot.documents.mapNotNull { it.toObject(Campaign::class.java) }
+            val campaigns = snapshot.documents.mapNotNull {
+                val campaign = it.toObject(Campaign::class.java)
+                campaign?.copy(id = it.id)
+            }
             Log.i("FirestoreTag", "got: ${campaigns.size} campaigns")
             return campaigns
-        }catch (e : Exception){
-            Log.e("FirestoreTag", e.message?:"some error occurred")
+        } catch (e: Exception) {
+            Log.e("FirestoreTag", e.message ?: "some error occurred")
             emptyList()
         }
     }
