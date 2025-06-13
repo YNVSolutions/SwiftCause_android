@@ -38,11 +38,12 @@ fun LoginScreen(
 
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.SpaceAround,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         when (authState) {
             AuthUiState.Unauthenticated -> {
+                Text("Welcome to SwiftCause")
                 Button(onClick = {
                     authViewModel.launchFirebaseAuthUI(signInLauncher)
                 }) {

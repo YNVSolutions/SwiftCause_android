@@ -18,6 +18,7 @@ fun DummyPaymentScreen(campId: String, amount: String, navController: NavControl
         verticalArrangement = Arrangement.SpaceAround,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Text("Dummy stripe payment gateway screen...")
         Text("Paying £$amount to campId: $campId")
         Button(onClick = {
             navController.navigate(Routes.thankYouScreen)

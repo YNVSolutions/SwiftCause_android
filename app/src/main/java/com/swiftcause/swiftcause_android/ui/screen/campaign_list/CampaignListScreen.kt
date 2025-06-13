@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,13 +28,16 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.swiftcause.swiftcause_android.ui.navigation.Routes
 import com.swiftcause.swiftcause_android.ui.screen.login.AuthUiState
 import com.swiftcause.swiftcause_android.ui.screen.login.AuthViewModel
@@ -44,8 +48,8 @@ fun CampaignListScreen(
     navController: NavController,
     name: String,
     viewModel: CampaignListViewModel = hiltViewModel(),
-    authViewModel : AuthViewModel = hiltViewModel(),
-    sharedViewModel : SharedViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel = hiltViewModel(),
+    sharedViewModel: SharedViewModel = hiltViewModel(),
     onLogoutRedirect: () -> Unit
 ) {
     LaunchedEffect(Unit) {
@@ -59,7 +63,7 @@ fun CampaignListScreen(
             .padding(top = 40.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-       Heading(authViewModel, onLogoutRedirect)
+        Heading(authViewModel, onLogoutRedirect)
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -98,67 +102,81 @@ fun CampaignCard(
     goalAmount: Double,
     tags: List<String>,
     navController: NavController,
-    campId : String,
+    campId: String,
+    imageUrl: String? = null,
     modifier: Modifier = Modifier,
-
 ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(8.dp)
-            .clickable {
-                navController.navigate(Routes.campaignDetailsScreen + "/${campId}")
-            },
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .clickable { navController.navigate(Routes.campaignDetailsScreen + "/${campId}") },
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
+        elevation = CardDefaults.cardElevation(6.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
+        Column {
 
-            Spacer(modifier = Modifier.height(4.dp))
-
-            description?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray,
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis
+            imageUrl?.let { url ->
+                AsyncImage(
+                    model = url,
+                    contentDescription = "Campaign Cover",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(160.dp)
+                        .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
 
-            Text(
-                text = "Goal: $${"%.2f".format(goalAmount)}",
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Medium
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            FlowRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                tags.forEach { tag ->
-                    AssistChip(
-                        onClick = {},
-                        label = { Text(text = tag) }
+                description?.let {
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Gray,
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis
                     )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Text(
+                    text = "Goal: $${"%,.2f".format(goalAmount)}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium
+                )
+
+                if (tags.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        tags.forEach { tag ->
+                            AssistChip(
+                                onClick = {},
+                                label = { Text(tag) }
+                            )
+                        }
+                    }
                 }
             }
         }
     }
 }
 
+
 @Composable
-fun Heading(authViewModel: AuthViewModel,onLogoutRedirect: () -> Unit ) {
+fun Heading(authViewModel: AuthViewModel, onLogoutRedirect: () -> Unit) {
     val authState by authViewModel.authUiState.collectAsState()
     val context = LocalContext.current
     Column(
@@ -169,12 +187,20 @@ fun Heading(authViewModel: AuthViewModel,onLogoutRedirect: () -> Unit ) {
         when (authState) {
             is AuthUiState.Authenticated -> {
                 val user = (authState as AuthUiState.Authenticated).user.currentUser
-                Text("Welcome, ${user?.displayName ?: user?.email}!")
-                Button(onClick = { authViewModel.signOut(context) }) {
-                    Text("Sign Out")
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Welcome, ${user?.displayName ?: user?.email}!")
+                    Button(onClick = { authViewModel.signOut(context) }) {
+                        Text("Sign Out")
+                    }
                 }
 
+
             }
+
             else -> {
                 onLogoutRedirect()
             }
