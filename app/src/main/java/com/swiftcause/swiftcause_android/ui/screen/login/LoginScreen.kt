@@ -60,7 +60,11 @@ fun LoginScreen(
                 Text("Authenticating...")
             }
             is AuthUiState.Authenticated -> {
-                navController.navigate(Routes.campaignListScreen + "/jitesh")
+                navController.navigate(Routes.campaignListScreen){
+                    popUpTo(Routes.loginScreen){
+                        inclusive = true
+                    }
+                }
                 Toast.makeText(context, "Logged in successfully!", Toast.LENGTH_SHORT).show()
             }
             else -> Toast.makeText(context, "Some error occurred!", Toast.LENGTH_SHORT).show()

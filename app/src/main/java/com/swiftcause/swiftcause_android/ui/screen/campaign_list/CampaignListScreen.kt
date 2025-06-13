@@ -46,7 +46,6 @@ import com.swiftcause.swiftcause_android.ui.shared.SharedViewModel
 @Composable
 fun CampaignListScreen(
     navController: NavController,
-    name: String,
     viewModel: CampaignListViewModel = hiltViewModel(),
     authViewModel: AuthViewModel = hiltViewModel(),
     sharedViewModel: SharedViewModel = hiltViewModel(),
