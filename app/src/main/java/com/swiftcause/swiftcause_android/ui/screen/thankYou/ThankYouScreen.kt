@@ -63,7 +63,14 @@ fun ThankYouScreen(
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(onClick = {
-            navController.navigate(Routes.campaignListScreen + "/Jitesh")
+            navController.navigate(Routes.campaignListScreen){
+                popUpTo(Routes.campaignListScreen){
+                    inclusive = true
+                }
+//                launchSingleTop = true
+
+
+            }
         }) {
             Text("Back to Campaigns")
         }

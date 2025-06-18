@@ -24,11 +24,9 @@ fun NavController() {
                 LoginScreen(navController = navController)
             }
 
-            composable(Routes.campaignListScreen + "/{name}") {
-                val name = it.arguments?.getString("name")
+            composable(Routes.campaignListScreen) {
                 CampaignListScreen(
                     navController,
-                    name ?: "User",
                     onLogoutRedirect = {
                         navController.navigate(Routes.loginScreen) {
                             popUpTo(Routes.loginScreen) {

@@ -38,11 +38,12 @@ fun LoginScreen(
 
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.SpaceAround,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         when (authState) {
             AuthUiState.Unauthenticated -> {
+                Text("Welcome to SwiftCause")
                 Button(onClick = {
                     authViewModel.launchFirebaseAuthUI(signInLauncher)
                 }) {
@@ -59,7 +60,11 @@ fun LoginScreen(
                 Text("Authenticating...")
             }
             is AuthUiState.Authenticated -> {
-                navController.navigate(Routes.campaignListScreen + "/jitesh")
+                navController.navigate(Routes.campaignListScreen){
+                    popUpTo(Routes.loginScreen){
+                        inclusive = true
+                    }
+                }
                 Toast.makeText(context, "Logged in successfully!", Toast.LENGTH_SHORT).show()
             }
             else -> Toast.makeText(context, "Some error occurred!", Toast.LENGTH_SHORT).show()
