@@ -7,7 +7,7 @@ import androidx.navigation.compose.rememberNavController
 import com.swiftcause.swiftcause_android.ui.screen.campaign_details.CampaignDetailsScreen
 import com.swiftcause.swiftcause_android.ui.screen.login.LoginScreen
 import com.swiftcause.swiftcause_android.ui.screen.campaign_list.CampaignListScreen
-import com.swiftcause.swiftcause_android.ui.screen.dummy_payment.CheckOutScreen
+import com.swiftcause.swiftcause_android.ui.screen.checkOut.CheckOutScreen
 import com.swiftcause.swiftcause_android.ui.screen.payment_options.PaymentOptionsScreen
 import com.swiftcause.swiftcause_android.ui.screen.thankYou.ThankYouScreen
 

@@ -5,8 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.stripe.android.PaymentConfiguration
 import com.stripe.android.paymentsheet.PaymentSheetResult
-import com.swiftcause.swiftcause_android.data.model.mock.PaymentRequest
-import com.swiftcause.swiftcause_android.data.model.mock.PaymentResponse
 import com.swiftcause.swiftcause_android.data.repository.PaymentRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -85,6 +83,7 @@ class PaymentViewModel @Inject constructor(
             }
             is PaymentSheetResult.Completed -> {
                 _uiState.value = PaymentUiState.Success("Payment completed successfully!")
+
             }
         }
     }

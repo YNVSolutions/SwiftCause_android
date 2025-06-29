@@ -1,4 +1,4 @@
-package com.swiftcause.swiftcause_android.data.model.mock
+package com.swiftcause.swiftcause_android.data.model
 
 data class PaymentRequest(
     val amount: Int,
