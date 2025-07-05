@@ -23,8 +23,6 @@ class AuthViewModel @Inject constructor(
     private val _authUiState = MutableStateFlow<AuthUiState>(AuthUiState.Unauthenticated)
     val authUiState: StateFlow<AuthUiState> = _authUiState
 
-//    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-
     init {
         // Check if user is already signed in on app start
         auth.currentUser?.let { user ->
@@ -36,8 +34,9 @@ class AuthViewModel @Inject constructor(
         _authUiState.value = AuthUiState.Authenticating
 
         val providers = arrayListOf(
-            AuthUI.IdpConfig.EmailBuilder().build(),
-            AuthUI.IdpConfig.GoogleBuilder().build()
+            AuthUI.IdpConfig.GoogleBuilder().build(),
+            AuthUI.IdpConfig.EmailBuilder().build()
+
         )
 
         val signInIntent = AuthUI.getInstance()
@@ -68,9 +67,8 @@ class AuthViewModel @Inject constructor(
     }
     fun signOut(context : Context) {
         viewModelScope.launch {
-            // Get application context from AndroidViewModel
             AuthUI.getInstance()
-                .signOut(context) // Correct way to sign out
+                .signOut(context)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         _authUiState.value = AuthUiState.Unauthenticated

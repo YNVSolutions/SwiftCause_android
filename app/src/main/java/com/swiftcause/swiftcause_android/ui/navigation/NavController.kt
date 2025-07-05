@@ -47,10 +47,10 @@ fun NavController() {
 
             }
 
-            composable(Routes.dummyPaymentScreen + "/{campId}/{amount}"){
-                val campId = it.arguments?.getString("campId")
-                val amount = it.arguments?.getString("amount")
-                CheckOutScreen(campId?:"null", amount?:"default_amt", navController)
+            composable(Routes.checkOutScreen) { backStackEntry ->
+                val campId = backStackEntry.arguments?.getString("campId") ?: "null"
+                val amount = backStackEntry.arguments?.getString("amount") ?: "0"
+                CheckOutScreen(campId, amount, navController)
             }
 
             composable(Routes.thankYouScreen) {

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.stripe.android.PaymentConfiguration
 import com.stripe.android.paymentsheet.PaymentSheetResult
 import com.swiftcause.swiftcause_android.data.repository.PaymentRepository
+import com.swiftcause.swiftcause_android.ui.screen.checkOut.PaymentUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,54 +21,50 @@ class PaymentViewModel @Inject constructor(
     @ApplicationContext private val applicationContext: Context
 ) : ViewModel() {
 
-    sealed class PaymentUiState {
-        object Idle : PaymentUiState()
-        object Loading : PaymentUiState()
-        data class ReadyForPayment(
-            val clientSecret: String,
-            val customerId: String,
-            val ephemeralKeySecret: String,
-            val publishableKey: String? // Pass publishableKey if present
-        ) : PaymentUiState()
-        data class Success(val message: String) : PaymentUiState()
-        data class Error(val message: String) : PaymentUiState()
-        object Canceled : PaymentUiState()
-    }
-
     private val _uiState = MutableStateFlow<PaymentUiState>(PaymentUiState.Idle)
     val uiState: StateFlow<PaymentUiState> = _uiState.asStateFlow()
 
+    private val _clientSecretState = MutableStateFlow<String?>(null)
+    val clientSecretState: StateFlow<String?> = _clientSecretState
+
+    private var fetchedDetails = false;
+
     fun initiatePayment(amount: Int, currency: String) {
-        viewModelScope.launch {
-            _uiState.value = PaymentUiState.Loading
-            try {
-//                val request = PaymentRequest(amount = amount, currency = currency)
-                val response = repository.createPaymentIntent(amount)
+        if (!fetchedDetails) {
+            viewModelScope.launch {
+                _uiState.value = PaymentUiState.Loading
+                try {
+                    val response = repository.createPaymentIntent(amount, currency)
 
-                if (response?.paymentIntentClientSecret != null &&
-                    response.customer != null &&
-                    response.ephemeralKey != null
-                ) {
-                    // Initialize Stripe's PaymentConfiguration with the publishableKey
-                    // if it's provided by your backend. Otherwise, it should be set
-                    // once in your Application class.
-                    response.publishableKey?.let {
-                        PaymentConfiguration.init(applicationContext, it)
+                    if (response?.paymentIntentClientSecret != null &&
+                        response.customer != null &&
+                        response.ephemeralKey != null
+                    ) {
+                        // Initialize Stripe's PaymentConfiguration with the publishableKey
+                        // if it's provided by the backend. Otherwise, it should be set
+                        // once in the Application class.
+                        response.publishableKey?.let {
+                            PaymentConfiguration.init(applicationContext, it)
+                        }
+                        _clientSecretState.value = response.paymentIntentClientSecret
+                        _uiState.value = PaymentUiState.ReadyForPayment(
+                            clientSecret = response.paymentIntentClientSecret,
+                            customerId = response.customer,
+                            ephemeralKeySecret = response.ephemeralKey,
+                            publishableKey = response.publishableKey
+                        )
+                        fetchedDetails = true;
+                    } else {
+                        // missing data from the backend response
+                        _uiState.value = PaymentUiState.Error(
+                            response?.status ?: "Failed"
+                        )
                     }
-
-                    _uiState.value = PaymentUiState.ReadyForPayment(
-                        clientSecret = response.paymentIntentClientSecret,
-                        customerId = response.customer,
-                        ephemeralKeySecret = response.ephemeralKey,
-                        publishableKey = response.publishableKey // Pass this along
-                    )
-                } else {
-                    // Handle cases where essential data is missing from the backend response
-                    _uiState.value = PaymentUiState.Error(response?.status ?: "Failed") // Use status as error message
+                } catch (e: Exception) {
+                    // Network error, parsing error, etc.
+                    _uiState.value =
+                        PaymentUiState.Error("Payment initiation failed: ${e.localizedMessage ?: "Unknown error"}")
                 }
-            } catch (e: Exception) {
-                // Network error, parsing error, etc.
-                _uiState.value = PaymentUiState.Error("Payment initiation failed: ${e.localizedMessage ?: "Unknown error"}")
             }
         }
     }
@@ -76,13 +73,16 @@ class PaymentViewModel @Inject constructor(
         when (paymentSheetResult) {
             is PaymentSheetResult.Canceled -> {
                 _uiState.value = PaymentUiState.Canceled
+                clearClientSecret()
             }
             is PaymentSheetResult.Failed -> {
                 val error = paymentSheetResult.error
                 _uiState.value = PaymentUiState.Error("Payment failed: ${error.localizedMessage ?: "Unknown error"}")
+                clearClientSecret()
             }
             is PaymentSheetResult.Completed -> {
                 _uiState.value = PaymentUiState.Success("Payment completed successfully!")
+                clearClientSecret()
 
             }
         }
@@ -90,5 +90,15 @@ class PaymentViewModel @Inject constructor(
 
     fun resetPaymentFlow() {
         _uiState.value = PaymentUiState.Idle
+        clearClientSecret()
+        resetFetchedDetailsFlag()
+    }
+
+    fun clearClientSecret(){
+        _clientSecretState.value = null
+    }
+
+    fun resetFetchedDetailsFlag(){
+        fetchedDetails = false;
     }
 }

@@ -59,7 +59,7 @@ fun CampaignListScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 40.dp),
+            .padding(top = 10.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Heading(authViewModel, onLogoutRedirect)
@@ -178,31 +178,25 @@ fun CampaignCard(
 fun Heading(authViewModel: AuthViewModel, onLogoutRedirect: () -> Unit) {
     val authState by authViewModel.authUiState.collectAsState()
     val context = LocalContext.current
-    Column(
-        modifier = Modifier.padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        when (authState) {
-            is AuthUiState.Authenticated -> {
-                val user = (authState as AuthUiState.Authenticated).user.currentUser
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text("Welcome, ${user?.displayName ?: user?.email}!")
-                    Button(onClick = { authViewModel.signOut(context) }) {
-                        Text("Sign Out")
-                    }
+
+    when (authState) {
+        is AuthUiState.Authenticated -> {
+            val user = (authState as AuthUiState.Authenticated).user.currentUser
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Welcome, ${user?.displayName ?: user?.email}!")
+                Button(onClick = { authViewModel.signOut(context) }) {
+                    Text("Sign Out")
                 }
-
-
-            }
-
-            else -> {
-                onLogoutRedirect()
             }
         }
+
+        else -> {
+            onLogoutRedirect()
+        }
     }
+
 }
