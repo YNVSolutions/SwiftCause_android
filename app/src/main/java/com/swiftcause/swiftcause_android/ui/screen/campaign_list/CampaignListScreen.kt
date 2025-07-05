@@ -96,6 +96,7 @@ fun CampaignListScreen(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CampaignCard(
+    modifier: Modifier = Modifier,
     title: String,
     description: String?,
     goalAmount: Double,
@@ -103,7 +104,7 @@ fun CampaignCard(
     navController: NavController,
     campId: String,
     imageUrl: String? = null,
-    modifier: Modifier = Modifier,
+
 ) {
     Card(
         modifier = modifier

@@ -64,7 +64,7 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.14.0"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
-    implementation("com.firebaseui:firebase-ui-auth:9.0.0") // Use the latest FirebaseUI Auth
+    implementation("com.firebaseui:firebase-ui-auth:9.0.0")
 
     // Google Play Services Auth (required for Google Sign-In with FirebaseUI)
     implementation("com.google.android.gms:play-services-auth:21.0.0")
@@ -84,8 +84,16 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.4.0")
     // stripe
     implementation ("com.stripe:stripe-android:21.18.0")
-//    implementation ("com.stripe:stripe-android-compose:21.18.0")
+
     // retrofit
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    // define a BOM and its version
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
+
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.1")
+
 }
