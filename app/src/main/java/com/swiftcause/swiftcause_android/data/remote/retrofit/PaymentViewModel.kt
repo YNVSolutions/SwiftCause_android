@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.stripe.android.PaymentConfiguration
 import com.stripe.android.paymentsheet.PaymentSheetResult
+import com.swiftcause.swiftcause_android.data.model.DonationMetaData
 import com.swiftcause.swiftcause_android.data.repository.PaymentRepository
 import com.swiftcause.swiftcause_android.ui.screen.checkOut.PaymentUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,12 +30,17 @@ class PaymentViewModel @Inject constructor(
 
     private var fetchedDetails = false;
 
-    fun initiatePayment(amount: Int, currency: String) {
+    fun initiatePayment(amount: Int, currency: String, campId: String) {
         if (!fetchedDetails) {
             viewModelScope.launch {
                 _uiState.value = PaymentUiState.Loading
                 try {
-                    val response = repository.createPaymentIntent(amount, currency)
+                    val metadata = DonationMetaData(
+                        campaignId = campId,
+                        donorName = "TestUser",
+                        donorId = "TestUid"
+                    )
+                    val response = repository.createPaymentIntent(amount, currency, metadata)
 
                     if (response?.paymentIntentClientSecret != null &&
                         response.customer != null &&

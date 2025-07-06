@@ -57,7 +57,7 @@ fun CheckOutScreen(
     val enteredAmount = amount.toDoubleOrNull() ?: 0.0;
     val pounds = enteredAmount * 100;
     LaunchedEffect(Unit) {
-        viewModel.initiatePayment(amount = pounds.roundToInt(), currency = "gbp")
+        viewModel.initiatePayment(amount = pounds.roundToInt(), currency = "gbp", campId = campId)
     }
 
 
@@ -86,7 +86,7 @@ fun CheckOutScreen(
                     (uiState as PaymentUiState.Error).message,
                     Toast.LENGTH_LONG
                 ).show()
-                Log.e("payment", (uiState as PaymentUiState.Error).message)
+                Log.e("payment", "UiState says: " + (uiState as PaymentUiState.Error).message)
                 viewModel.resetPaymentFlow() // Reset UI state after error
             }
 

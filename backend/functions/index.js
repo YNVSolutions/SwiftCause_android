@@ -3,9 +3,43 @@ const admin = require("firebase-admin");
 const dotenv = require("dotenv");
 dotenv.config();
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-
+const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 admin.initializeApp();
+
+exports.handleStripeWebhook = functions.https.onRequest(async (req, res) => {
+  let event;
+
+  try {
+    const sig = req.headers["stripe-signature"];
+    event = stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret);
+  } catch (err) {
+    console.error("Webhook Error:", err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  if (event.type === "payment_intent.succeeded") {
+    const paymentIntent = event.data.object;
+
+    const donationData = {
+      campaignId: paymentIntent.metadata.campaignId || null,
+      amount: paymentIntent.amount,
+      currency: paymentIntent.currency,
+      donorId: paymentIntent.metadata.donorId || null,
+      donorName: paymentIntent.metadata.donorName || "Anonymous",
+      timestamp: admin.firestore.Timestamp.now(),
+      isGiftAid: paymentIntent.metadata.isGiftAid === "true",
+      paymentStatus: "success",
+      platform: paymentIntent.metadata.platform || "android",
+      stripePaymentIntentId: paymentIntent.id,
+    };
+
+    await admin.firestore().collection("donations").add(donationData);
+    console.log("Donation stored for:", paymentIntent.id);
+  }
+
+  res.status(200).send("OK");
+});
 
 exports.createPaymentIntent = functions.https.onRequest(async (req, res) => {
   try {
@@ -19,11 +53,6 @@ exports.createPaymentIntent = functions.https.onRequest(async (req, res) => {
     const uid = decodedToken.uid;
     const email = decodedToken.email;
     const name = decodedToken.name || "Anonymous";
-
-    const {amount, currency} = req.body;
-    if (!amount || !currency) {
-      return res.status(400).send({error: "Missing amount or currency"});
-    }
 
     const userRef = admin.firestore().collection("users").doc(uid);
     const userDoc = await userRef.get();
@@ -48,11 +77,27 @@ exports.createPaymentIntent = functions.https.onRequest(async (req, res) => {
         {apiVersion: "2022-11-15"},
     );
 
+    const {amount, currency, metadata} = req.body;
+
+    if (!amount || !currency) {
+      return res.status(400).send({error: "Missing amount or currency"});
+    }
+
+    const {campaignId, donorId, donorName, isGiftAid, platform} =
+      metadata;
+
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency,
       customer: customerId,
       payment_method_types: ["card"],
+      metadata: {
+        campaignId,
+        donorId,
+        donorName,
+        isGiftAid: isGiftAid.toString(),
+        platform,
+      },
     });
 
     res.status(200).send({
