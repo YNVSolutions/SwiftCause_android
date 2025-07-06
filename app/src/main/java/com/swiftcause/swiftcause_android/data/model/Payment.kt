@@ -2,7 +2,8 @@ package com.swiftcause.swiftcause_android.data.model
 
 data class PaymentRequest(
     val amount: Int,
-    val currency: String
+    val currency: String,
+    val metadata: DonationMetaData
 )
 
 data class PaymentResponse(
