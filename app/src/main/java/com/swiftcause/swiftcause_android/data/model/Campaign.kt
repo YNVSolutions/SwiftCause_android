@@ -1,10 +1,11 @@
 package com.swiftcause.swiftcause_android.data.model
 
+import com.google.firebase.Timestamp
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
 enum class CampaignStatus {
-    active, complete, paused  // should be all caps but as the data in firebase currently has lowercase, using this for testing
+    active, completed, paused  // should be all caps but as the data in firebase currently has lowercase, using this for testing
 }
 
 data class Campaign(
@@ -15,15 +16,15 @@ data class Campaign(
     val goalAmount: Double = 0.0,
     val collectedAmount: Double = 0.0,
     val currency: String = "USD",
-    val status: String = "active", // use enum later
-    val startDate: String? = null,
-    val endDate: String? = null,
+    val status: CampaignStatus = CampaignStatus.active,
+    val startDate: Timestamp? = null,
+    val endDate: Timestamp? = null,
     val coverImageUrl: String? = null,
     val createdBy: String? = null,
     val tags: List<String> = emptyList(),
     val giftAidEnabled: Boolean = false,
     val donationCount: Int = 0,
-    val lastUpdated: String? = null
+    val lastUpdated: Timestamp? = null
 )
 /*
 Sample data for reference

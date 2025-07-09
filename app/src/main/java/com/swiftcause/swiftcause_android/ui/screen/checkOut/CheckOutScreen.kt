@@ -4,10 +4,21 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,6 +33,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.modifier.modifierLocalConsumer
+import androidx.compose.ui.modifier.modifierLocalProvider
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.stripe.android.paymentsheet.PaymentSheet
 import com.stripe.android.paymentsheet.PaymentSheetResultCallback
@@ -73,8 +89,8 @@ fun CheckOutScreen(
                 ).show()
                 viewModel.resetPaymentFlow()
                 viewModel.resetPaymentFlow()
-                navController.navigate(Routes.thankYouScreen){
-                    popUpTo(Routes.checkOutScreen){ // removing the checkout screen from the backstack
+                navController.navigate(Routes.thankYouScreen) {
+                    popUpTo(Routes.checkOutScreen) { // removing the checkout screen from the backstack
                         inclusive = true
                     }
                 }
@@ -106,6 +122,46 @@ fun CheckOutScreen(
         verticalArrangement = Arrangement.SpaceAround,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
+        Text("Checkout Screen", fontSize = MaterialTheme.typography.titleLarge.fontSize)
+        Text("Donating £$amount to campId: $campId", overflow = TextOverflow.Ellipsis, maxLines = 1)
+        when (uiState) {
+            is PaymentUiState.Loading -> {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    CircularProgressIndicator()
+                    Spacer(Modifier.width(10.dp))
+                    Text("Getting Ready for payment...")
+                }
+
+            }
+
+            is PaymentUiState.ReadyForPayment -> {
+//                CircularProgressIndicator()
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = "Success",
+                        tint = Color(0xFF4CAF50),
+                        modifier = Modifier.size(40.dp)
+                    )
+                    Spacer(Modifier.width(10.dp))
+                    Text("Ready for payment...")
+                }
+
+            }
+            // For Success, Error, Canceled, the Toast handles immediate feedback,
+            // and the UI resets back to Idle, so no persistent text is needed here
+            else -> { /* Do nothing for Idle, Success, Error, Canceled */
+            }
+        }
         Button(
             onClick = {
                 checkoutButtonClicked = true
@@ -121,24 +177,7 @@ fun CheckOutScreen(
         ) {
             Text("Proceed to payment")
         }
-        Text("Checkout Screen...")
-        Text("Donating £$amount to campId: $campId")
 
-        when (uiState) {
-            is PaymentUiState.Loading -> {
-                CircularProgressIndicator()
-                Text("Loading...")
-            }
-
-            is PaymentUiState.ReadyForPayment -> {
-//                CircularProgressIndicator()
-                Text("Initializing payment...")
-            }
-            // For Success, Error, Canceled, the Toast handles immediate feedback,
-            // and the UI resets back to Idle, so no persistent text is needed here
-            else -> { /* Do nothing for Idle, Success, Error, Canceled */
-            }
-        }
 
     }
 }

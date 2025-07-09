@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -31,11 +33,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.swiftcause.swiftcause_android.ui.navigation.Routes
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -108,7 +114,7 @@ fun CampaignDetailsScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = campaign?.title?: "No title",
+                                text = campaign?.title ?: "No title",
                                 style = MaterialTheme.typography.headlineSmall,
                                 fontWeight = FontWeight.Bold
                             )
@@ -130,17 +136,32 @@ fun CampaignDetailsScreen(
                     // Goal & Collected
                     item {
                         Text(
-                            text = "${campaign?.currency} ${campaign?.collectedAmount} raised of ${campaign?.goalAmount}",
+                            text = "${campaign?.currency} ${campaign?.collectedAmount?.div(100)} raised of ${
+                                campaign?.goalAmount?.div(
+                                    100
+                                )
+                            }",
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium
                         )
-//                        LinearProgressIndicator(
-//                            progress = (campaign?.collectedAmount?.div(campaign.goalAmount))?.toFloat()?.coerceIn(0f, 1f),
-//                            modifier = Modifier
-//                                .fillMaxWidth()
-//                                .height(10.dp)
-//                                .clip(RoundedCornerShape(4.dp))
-//                        )
+                        val collected = campaign?.collectedAmount ?: 0
+                        val goal = campaign?.goalAmount ?: 1
+                        val progressPercent = (collected.toFloat() / goal.toFloat()) * 100
+
+                        val progressFraction = progressPercent.coerceIn(0f, 100f) / 100f
+                        Spacer(modifier = Modifier.height(20.dp))
+                        LinearProgressIndicator(
+                            progress = { progressFraction },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(10.dp)
+                                .clip(RoundedCornerShape(4.dp)),
+                            color = MaterialTheme.colorScheme.primary,
+                            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                            strokeCap = StrokeCap.Butt,
+                        )
+
+
                     }
 
                     // Tags
@@ -164,15 +185,33 @@ fun CampaignDetailsScreen(
                     item {
                         Column {
                             campaign?.startDate?.let {
-                                Text("Start Date: $it", style = MaterialTheme.typography.labelMedium)
+                                val formattedDate = it.toDate().let {
+                                    SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(it)
+                                } ?: "Unknown"
+                                Text(
+                                    "Start Date: $formattedDate",
+                                    style = MaterialTheme.typography.labelMedium
+                                )
                             }
                             campaign?.endDate?.let {
-                                Text("End Date: $it", style = MaterialTheme.typography.labelMedium)
+                                val formattedDate = it.toDate().let {
+                                    SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(it)
+                                } ?: "Unknown"
+                                Text(
+                                    "End Date: $formattedDate",
+                                    style = MaterialTheme.typography.labelMedium
+                                )
                             }
                             Text("Gift Aid: ${if (campaign?.giftAidEnabled == true) "Enabled" else "Not Enabled"}")
                             Text("Donations: ${campaign?.donationCount}")
                             campaign?.lastUpdated?.let {
-                                Text("Last Updated: $it", style = MaterialTheme.typography.labelSmall)
+                                val formattedDate = it.toDate().let {
+                                    SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(it)
+                                } ?: "Unknown"
+                                Text(
+                                    "Last Updated: $formattedDate",
+                                    style = MaterialTheme.typography.labelSmall
+                                )
                             }
                         }
                     }
@@ -187,6 +226,7 @@ fun CampaignDetailsScreen(
         }
     }
 }
+
 @Composable
 fun StatusBadge(status: String) {
     val color = when (status.lowercase()) {
@@ -201,7 +241,11 @@ fun StatusBadge(status: String) {
             .background(color, RoundedCornerShape(12.dp))
             .padding(horizontal = 12.dp, vertical = 4.dp)
     ) {
-        Text(text = status.capitalize(), color = Color.White, style = MaterialTheme.typography.labelMedium)
+        Text(
+            text = status.capitalize(),
+            color = Color.White,
+            style = MaterialTheme.typography.labelMedium
+        )
     }
 }
 
