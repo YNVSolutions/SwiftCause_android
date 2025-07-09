@@ -59,7 +59,7 @@ fun CampaignListScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 10.dp),
+            .padding(vertical = 5.dp, horizontal = 5.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Heading(authViewModel, onLogoutRedirect)
@@ -76,10 +76,11 @@ fun CampaignListScreen(
                         CampaignCard(
                             title = campaign.title,
                             description = campaign.description,
-                            goalAmount = campaign.goalAmount,
+                            goalAmount = campaign.goalAmount / 100,
                             tags = campaign.tags,
                             navController = navController,
-                            campId = campaign.id
+                            campId = campaign.id,
+                            imageUrl = campaign.coverImageUrl
 
                         )
 
@@ -184,7 +185,7 @@ fun Heading(authViewModel: AuthViewModel, onLogoutRedirect: () -> Unit) {
         is AuthUiState.Authenticated -> {
             val user = (authState as AuthUiState.Authenticated).user.currentUser
             Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
