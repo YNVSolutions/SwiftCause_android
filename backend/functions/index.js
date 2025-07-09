@@ -36,6 +36,19 @@ exports.handleStripeWebhook = functions.https.onRequest(async (req, res) => {
 
     await admin.firestore().collection("donations").add(donationData);
     console.log("Donation stored for:", paymentIntent.id);
+
+    const campaignId = paymentIntent.metadata.campaignId;
+    const campaignRef = admin.firestore()
+        .collection("campaigns").doc(campaignId);
+
+    await campaignRef.update({
+      collectedAmount: admin.firestore.FieldValue
+          .increment(paymentIntent.amount),
+
+      donationCount: admin.firestore.FieldValue.increment(1),
+      lastUpdated: admin.firestore.Timestamp.now(),
+    });
+    console.log("Campaign updated for donation:", campaignId);
   }
 
   res.status(200).send("OK");
