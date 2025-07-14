@@ -71,7 +71,6 @@ fun CampaignDetailsScreen(
 
         uiState.campaign != null -> {
             val campaign = uiState.campaign
-            sharedViewModel.selectedCampaign = campaign
 
             Scaffold(
                 bottomBar = {

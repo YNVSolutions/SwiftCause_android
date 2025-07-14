@@ -153,7 +153,7 @@ fun CheckOutScreen(
             Text("Checkout Screen", fontSize = MaterialTheme.typography.titleLarge.fontSize)
             Text("Donating £$amount to campaign: ")
             Text(
-                "${sharedViewModel.selectedCampaign?.title}",
+                "${sharedViewModel.getSelectedCampaign()?.title}",
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1
             )

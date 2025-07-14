@@ -18,28 +18,31 @@ class SharedViewModel @Inject constructor(
     private val repository: CampaignRepository
 ) : ViewModel() {
 
-//    private val _campaigns = MutableStateFlow<List<Campaign>>(emptyList())
-//    val campaigns: StateFlow<List<Campaign>> = _campaigns
 
     private val _sharedUiState = MutableStateFlow(SharedUiState())
     val sharedUiState: StateFlow<SharedUiState> = _sharedUiState.asStateFlow()
 
-    var selectedCampaign : Campaign? = null;
+//    var selectedCampaign : Campaign? = null;
     init {
         Log.i("Shared_vm", "Shared viewModel started")
         _sharedUiState.value = _sharedUiState.value.copy(isLoading = true)
         viewModelScope.launch {
             try {
-//                _campaigns.value = repository.fetchCampaigns()
                 _sharedUiState.value = _sharedUiState.value.copy(
                     campaigns = repository.fetchCampaigns(),
                     isLoading = false
                 )
-//                Log.i("FirestoreTag", "in shared vm : ${_campaigns.value.size}")
             } catch (e: Exception) {
                 Log.e("Shared_vm", "Error fetching campaigns", e)
                 _sharedUiState.value = _sharedUiState.value.copy(error = e.message)
             }
         }
+    }
+
+    fun setSelectedCampaign(campaign : Campaign?){
+        _sharedUiState.value = _sharedUiState.value.copy(currentCampaign = campaign)
+    }
+    fun getSelectedCampaign() : Campaign?{
+        return _sharedUiState.value.currentCampaign
     }
 }

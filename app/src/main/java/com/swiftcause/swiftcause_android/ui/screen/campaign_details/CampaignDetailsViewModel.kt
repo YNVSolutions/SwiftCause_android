@@ -28,8 +28,8 @@ class CampaignDetailsViewModel @Inject constructor() : ViewModel() {
                 .first()
 
             val campaign = sharedState.campaigns.find { it.id == campId }
-            sharedViewModel.selectedCampaign = campaign
             if (campaign != null){
+                sharedViewModel.setSelectedCampaign(campaign)
                 _uiState.value = _uiState.value.copy(campaign = campaign, isLoading = false)
             }else{
                 _uiState.value = _uiState.value.copy(error = "Could not find the requested campaign", isLoading = false)
