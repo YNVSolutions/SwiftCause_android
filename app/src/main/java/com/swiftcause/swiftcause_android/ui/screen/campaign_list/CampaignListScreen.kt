@@ -1,5 +1,6 @@
 package com.swiftcause.swiftcause_android.ui.screen.campaign_list
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,6 +45,7 @@ import com.swiftcause.swiftcause_android.ui.screen.login.AuthUiState
 import com.swiftcause.swiftcause_android.ui.screen.login.AuthViewModel
 import com.swiftcause.swiftcause_android.ui.shared.SharedViewModel
 
+@SuppressLint("UnrememberedGetBackStackEntry")
 @Composable
 fun CampaignListScreen(
     navController: NavController,
@@ -78,9 +81,9 @@ fun CampaignListScreen(
                             description = campaign.description,
                             goalAmount = campaign.goalAmount / 100,
                             tags = campaign.tags,
-                            navController = navController,
-                            campId = campaign.id,
-                            imageUrl = campaign.coverImageUrl
+                            imageUrl = campaign.coverImageUrl,
+                            onClickAction = {
+                                navController.navigate("${Routes.campaignDetailsScreen}/${campaign.id}")}
 
                         )
 
@@ -102,16 +105,17 @@ fun CampaignCard(
     description: String?,
     goalAmount: Double,
     tags: List<String>,
-    navController: NavController,
-    campId: String,
     imageUrl: String? = null,
+    onClickAction : () -> Unit
 
-) {
+    ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 12.dp, vertical = 8.dp)
-            .clickable { navController.navigate(Routes.campaignDetailsScreen + "/${campId}") },
+            .clickable {
+                onClickAction()
+            },
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(6.dp)
     ) {
@@ -185,7 +189,9 @@ fun Heading(authViewModel: AuthViewModel, onLogoutRedirect: () -> Unit) {
         is AuthUiState.Authenticated -> {
             val user = (authState as AuthUiState.Authenticated).user.currentUser
             Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {

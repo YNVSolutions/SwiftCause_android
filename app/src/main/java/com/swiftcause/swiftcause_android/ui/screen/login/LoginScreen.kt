@@ -25,7 +25,6 @@ import com.swiftcause.swiftcause_android.ui.navigation.Routes
 @Composable
 fun LoginScreen(
     authViewModel: AuthViewModel = hiltViewModel(),
-//    onLoginSuccess: () -> Unit
     navController: NavController
 ) {
     val authState by authViewModel.authUiState.collectAsState()
@@ -47,7 +46,7 @@ fun LoginScreen(
                 Button(onClick = {
                     authViewModel.launchFirebaseAuthUI(signInLauncher)
                 }) {
-                    Text("Login with Firebase")
+                    Text("Login/SignUp")
                 }
 
                 if (authState is AuthUiState.Error) {
@@ -65,7 +64,7 @@ fun LoginScreen(
                         inclusive = true
                     }
                 }
-                Toast.makeText(context, "Logged in successfully!", Toast.LENGTH_SHORT).show()
+//                Toast.makeText(context, "Logged in successfully!", Toast.LENGTH_SHORT).show()
             }
             else -> Toast.makeText(context, "Some error occurred!", Toast.LENGTH_SHORT).show()
         }

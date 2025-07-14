@@ -22,16 +22,13 @@ class CampaignDetailsViewModel @Inject constructor() : ViewModel() {
     fun getCampaignDetails(campId : String, sharedViewModel: SharedViewModel){
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
-//            val sharedState = sharedViewModel.sharedUiState.value // we are using the snapshot of the flow here. we don't require live data as the campaign id is not dynamically changing
-//            Log.d("debug", "${sharedViewModel.sharedUiState.value.campaigns.size}")
-//            val campaign = sharedState.campaigns.find { it.id == campId }
 
             val sharedState = sharedViewModel.sharedUiState
                 .filter { it.campaigns.isNotEmpty() }
                 .first()
-//            Log.d("debug", "${sharedState.campaigns.size}")
-            val campaign = sharedState.campaigns.find { it.id == campId }
 
+            val campaign = sharedState.campaigns.find { it.id == campId }
+            sharedViewModel.selectedCampaign = campaign
             if (campaign != null){
                 _uiState.value = _uiState.value.copy(campaign = campaign, isLoading = false)
             }else{

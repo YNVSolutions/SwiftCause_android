@@ -24,6 +24,7 @@ class SharedViewModel @Inject constructor(
     private val _sharedUiState = MutableStateFlow(SharedUiState())
     val sharedUiState: StateFlow<SharedUiState> = _sharedUiState.asStateFlow()
 
+    var selectedCampaign : Campaign? = null;
     init {
         Log.i("Shared_vm", "Shared viewModel started")
         _sharedUiState.value = _sharedUiState.value.copy(isLoading = true)

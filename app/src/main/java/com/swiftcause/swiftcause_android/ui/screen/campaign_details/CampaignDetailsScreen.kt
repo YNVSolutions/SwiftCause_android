@@ -1,6 +1,7 @@
 package com.swiftcause.swiftcause_android.ui.screen.campaign_details
 
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,6 +30,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.swiftcause.swiftcause_android.ui.shared.SharedViewModel
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,14 +45,16 @@ import com.swiftcause.swiftcause_android.ui.navigation.Routes
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+@SuppressLint("UnrememberedGetBackStackEntry")
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CampaignDetailsScreen(
     navController: NavController,
     campId: String,
     viewModel: CampaignDetailsViewModel = hiltViewModel(),
-    sharedViewModel: SharedViewModel = hiltViewModel()
 ) {
+    val parentEntry = remember{navController.getBackStackEntry("campaignFlow")}
+    val sharedViewModel : SharedViewModel = hiltViewModel(parentEntry)
     LaunchedEffect(Unit) {
         viewModel.getCampaignDetails(campId, sharedViewModel)
     }
@@ -67,6 +71,7 @@ fun CampaignDetailsScreen(
 
         uiState.campaign != null -> {
             val campaign = uiState.campaign
+            sharedViewModel.selectedCampaign = campaign
 
             Scaffold(
                 bottomBar = {
@@ -154,11 +159,11 @@ fun CampaignDetailsScreen(
                             progress = { progressFraction },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(10.dp)
+                                .height(8.dp)
                                 .clip(RoundedCornerShape(4.dp)),
                             color = MaterialTheme.colorScheme.primary,
                             trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                            strokeCap = StrokeCap.Butt,
+                            strokeCap = StrokeCap.Round,
                         )
 
 
