@@ -3,6 +3,7 @@ package com.swiftcause.swiftcause_android.ui.navigation
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.swiftcause.swiftcause_android.ui.screen.campaign_details.CampaignDetailsScreen
 import com.swiftcause.swiftcause_android.ui.screen.login.LoginScreen
@@ -35,26 +36,30 @@ fun NavController() {
                         }
                     })
             }
+            navigation(
+                startDestination = Routes.campaignDetailsScreen + "/{campId}",
+                route = "campaignFlow"
+            ) {
+                composable(Routes.campaignDetailsScreen + "/{campId}") {
+                    val campId = it.arguments?.getString("campId")
+                    CampaignDetailsScreen(navController, campId ?: "null")
+                }
 
-            composable(Routes.campaignDetailsScreen + "/{campId}") {
-                val campId = it.arguments?.getString("campId")
-                CampaignDetailsScreen(navController, campId ?: "null")
-            }
+                composable(Routes.paymentOptionsScreen + "/{campId}") {
+                    val campId = it.arguments?.getString("campId")
+                    PaymentOptionsScreen(navController, campId ?: "null")
 
-            composable(Routes.paymentOptionsScreen + "/{campId}") {
-                val campId = it.arguments?.getString("campId")
-                PaymentOptionsScreen(navController, campId ?: "null")
+                }
 
-            }
+                composable(Routes.checkOutScreen) { backStackEntry ->
+                    val campId = backStackEntry.arguments?.getString("campId") ?: "null"
+                    val amount = backStackEntry.arguments?.getString("amount") ?: "0"
+                    CheckOutScreen(campId, amount, navController)
+                }
 
-            composable(Routes.checkOutScreen) { backStackEntry ->
-                val campId = backStackEntry.arguments?.getString("campId") ?: "null"
-                val amount = backStackEntry.arguments?.getString("amount") ?: "0"
-                CheckOutScreen(campId, amount, navController)
-            }
-
-            composable(Routes.thankYouScreen) {
-                ThankYouScreen(navController)
+                composable(Routes.thankYouScreen) {
+                    ThankYouScreen(navController)
+                }
             }
         }
     )

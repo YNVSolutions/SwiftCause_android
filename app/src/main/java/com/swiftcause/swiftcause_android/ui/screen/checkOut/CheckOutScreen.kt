@@ -1,5 +1,6 @@
 package com.swiftcause.swiftcause_android.ui.screen.checkOut
 
+import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
@@ -19,6 +21,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -42,16 +45,20 @@ import androidx.compose.ui.unit.dp
 import com.stripe.android.paymentsheet.PaymentSheet
 import com.stripe.android.paymentsheet.PaymentSheetResultCallback
 import com.swiftcause.swiftcause_android.ui.navigation.Routes
+import com.swiftcause.swiftcause_android.ui.shared.SharedViewModel
 import kotlin.math.roundToInt
 
 
+@SuppressLint("UnrememberedGetBackStackEntry")
 @Composable
 fun CheckOutScreen(
     campId: String,
     amount: String,
     navController: NavController,
-    viewModel: PaymentViewModel = hiltViewModel()
+    viewModel: PaymentViewModel = hiltViewModel(),
 ) {
+    val parentEntry = remember { navController.getBackStackEntry("campaignFlow") }
+    val sharedViewModel: SharedViewModel = hiltViewModel(parentEntry)
 
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
@@ -115,96 +122,105 @@ fun CheckOutScreen(
             }
         }
     }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(8.dp),
-        verticalArrangement = Arrangement.SpaceAround,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    Scaffold(
+        bottomBar = {
+            Button(
+                modifier = Modifier.fillMaxWidth()
+                .padding(16.dp),
+                onClick = {
+                    checkoutButtonClicked = true
+                    showStripeUI(
+                        clientSecret = clientSecret,
+                        uiState = uiState,
+                        paymentSheet = paymentSheet
+                    );
 
-        Text("Checkout Screen", fontSize = MaterialTheme.typography.titleLarge.fontSize)
-        Text("Donating £$amount to campId: $campId", overflow = TextOverflow.Ellipsis, maxLines = 1)
-        when (uiState) {
-            is PaymentUiState.Loading -> {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    CircularProgressIndicator()
-                    Spacer(Modifier.width(10.dp))
-                    Text("Getting Ready for payment...")
-                }
-
-            }
-
-            is PaymentUiState.ReadyForPayment -> {
-//                CircularProgressIndicator()
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = "Success",
-                        tint = Color(0xFF4CAF50),
-                        modifier = Modifier.size(40.dp)
-                    )
-                    Spacer(Modifier.width(10.dp))
-                    Text("Ready for payment...")
-                }
-
-            }
-            // For Success, Error, Canceled, the Toast handles immediate feedback,
-            // and the UI resets back to Idle, so no persistent text is needed here
-            else -> { /* Do nothing for Idle, Success, Error, Canceled */
+                },
+                enabled = (clientSecret != null)
+            ) {
+                Text("Proceed to payment")
             }
         }
-        Button(
-            onClick = {
-                checkoutButtonClicked = true
-                showStripeUI(
-                    clientSecret = clientSecret,
-                    uiState = uiState,
-                    viewModel = viewModel,
-                    paymentSheet = paymentSheet
-                );
-
-            },
-            enabled = (clientSecret != null)
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            verticalArrangement = Arrangement.SpaceAround,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Proceed to payment")
+
+            Text("Checkout Screen", fontSize = MaterialTheme.typography.titleLarge.fontSize)
+            Text("Donating £$amount to campaign: ")
+            Text(
+                "${sharedViewModel.getSelectedCampaign()?.title}",
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1
+            )
+            when (uiState) {
+                is PaymentUiState.Loading -> {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CircularProgressIndicator()
+                        Spacer(Modifier.width(10.dp))
+                        Text("Getting Ready for payment...")
+                    }
+
+                }
+
+                is PaymentUiState.ReadyForPayment -> {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "Success",
+                            tint = Color(0xFF4CAF50),
+                            modifier = Modifier.size(40.dp)
+                        )
+                        Spacer(Modifier.width(10.dp))
+                        Text("Ready for payment...")
+                    }
+
+                }
+                // For Success, Error, Canceled, the Toast handles immediate feedback,
+                // and the UI resets back to Idle, so no persistent text is needed here
+                else -> { /* Do nothing for Idle, Success, Error, Canceled */
+                }
+            }
+
+
+
         }
-
-
     }
 }
+    fun showStripeUI(
+        clientSecret: String?,
+        uiState: PaymentUiState,
+        paymentSheet: PaymentSheet
+    ) {
+        if (clientSecret != null) {
+            val state = uiState as? PaymentUiState.ReadyForPayment
+            state?.let {
+                val configuration = PaymentSheet.Configuration(
+                    merchantDisplayName = "SwiftCause",
+                    customer = PaymentSheet.CustomerConfiguration(
+                        state.customerId,
+                        state.ephemeralKeySecret
+                    ),
 
-fun showStripeUI(
-    clientSecret: String?,
-    uiState: PaymentUiState,
-    viewModel: PaymentViewModel,
-    paymentSheet: PaymentSheet
-) {
-    if (clientSecret != null) {
-        val state = uiState as? PaymentUiState.ReadyForPayment
-        state?.let {
-            val configuration = PaymentSheet.Configuration(
-                merchantDisplayName = "SwiftCause",
-                customer = PaymentSheet.CustomerConfiguration(
-                    state.customerId,
-                    state.ephemeralKeySecret
-                ),
+                    allowsDelayedPaymentMethods = false // Enable deferred payments
+                )
 
-                allowsDelayedPaymentMethods = false // Enable deferred payments
-            )
-
-            paymentSheet.presentWithPaymentIntent(
-                state.clientSecret,
-                configuration
-            )
+                paymentSheet.presentWithPaymentIntent(
+                    state.clientSecret,
+                    configuration
+                )
+            }
         }
     }
-}

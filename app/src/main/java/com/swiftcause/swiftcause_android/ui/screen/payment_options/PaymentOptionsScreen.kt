@@ -1,5 +1,6 @@
 package com.swiftcause.swiftcause_android.ui.screen.payment_options
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,16 +25,21 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.swiftcause.swiftcause_android.ui.navigation.Routes
+import com.swiftcause.swiftcause_android.ui.shared.SharedViewModel
 
+@SuppressLint("UnrememberedGetBackStackEntry")
 @Composable
 fun PaymentOptionsScreen(navController: NavController, campId : String) {
     val currencySign = "£"
     val donationOptions = listOf("5", "10", "25", "50")
     var selectedOption by remember { mutableStateOf<String?>(null) }
     var customAmount by remember { mutableStateOf("") }
-    val context = LocalContext.current
+
+    val parentEntry = remember { navController.getBackStackEntry("campaignFlow") }
+    val sharedViewModel : SharedViewModel = hiltViewModel(parentEntry) // me be useful later, added this just in case
     Column(
         modifier = Modifier
             .fillMaxSize()
