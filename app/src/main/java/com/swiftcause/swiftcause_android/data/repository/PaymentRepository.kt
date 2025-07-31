@@ -14,4 +14,8 @@ class PaymentRepository @Inject constructor(
         val response = api.createPaymentIntent(request)
         return if (response.isSuccessful) response.body() else null
     }
+
+    suspend fun createTTPPaymentIntent(amount: Int, metaData: DonationMetaData) : PaymentResponse?{
+        return createPaymentIntent(amount = amount, currency = "gbp", metadata = metaData.copy(platform = "android_ttp"))
+    }
 }

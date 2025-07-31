@@ -53,6 +53,16 @@ exports.handleStripeWebhook = functions.https.onRequest(async (req, res) => {
 
   res.status(200).send("OK");
 });
+exports.getConnectionToken = functions.https.onRequest(async (req, res) => {
+  try {
+    const connectionToken = await stripe.terminal.connectionTokens.create();
+    res.status(200).json({secret: connectionToken.secret});
+  } catch (err) {
+    console.error("Error creating connection token:", err);
+    res.status(500).json({error: "Unable to create connection token"});
+  }
+});
+
 
 exports.createPaymentIntent = functions.https.onRequest(async (req, res) => {
   try {
@@ -91,19 +101,25 @@ exports.createPaymentIntent = functions.https.onRequest(async (req, res) => {
     );
 
     const {amount, currency, metadata} = req.body;
+    const {platform} = metadata || null;
+
+    let paymentMethodTypes = ["card"];
+    if (platform === "android_ttp") {
+      paymentMethodTypes = ["card_present"];
+    }
 
     if (!amount || !currency) {
       return res.status(400).send({error: "Missing amount or currency"});
     }
 
-    const {campaignId, donorId, donorName, isGiftAid, platform} =
+    const {campaignId, donorId, donorName, isGiftAid} =
       metadata;
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency,
       customer: customerId,
-      payment_method_types: ["card"],
+      payment_method_types: paymentMethodTypes,
       metadata: {
         campaignId,
         donorId,
@@ -113,13 +129,21 @@ exports.createPaymentIntent = functions.https.onRequest(async (req, res) => {
       },
     });
 
-    res.status(200).send({
-      paymentIntentClientSecret: paymentIntent.client_secret,
-      customer: customerId,
-      ephemeralKey: ephemeralKey.secret,
-    });
+    if (platform === "android_ttp") {
+      res.status(200).send({
+        paymentIntentId: paymentIntent.id,
+        customer: customerId,
+      });
+    } else {
+      res.status(200).send({
+        paymentIntentClientSecret: paymentIntent.client_secret,
+        customer: customerId,
+        ephemeralKey: ephemeralKey.secret,
+      });
+    }
   } catch (err) {
     console.error("Error creating payment intent:", err);
     return res.status(500).send({error: err.message});
   }
 });
+
