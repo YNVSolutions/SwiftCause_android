@@ -3,6 +3,7 @@ package com.swiftcause.swiftcause_android.data.remote.retrofit
 import com.stripe.stripeterminal.external.callable.ConnectionTokenCallback
 import com.stripe.stripeterminal.external.callable.ConnectionTokenProvider
 import com.stripe.stripeterminal.external.models.ConnectionTokenException
+import com.swiftcause.swiftcause_android.data.remote.logDebugStep
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,6 +23,7 @@ class RetrofitTokenProvider(
                 }
             } catch (e: Exception) {
                 callback.onFailure(ConnectionTokenException("Exception: ${e.localizedMessage}"))
+                logDebugStep("Exception while fetching connection token: ${e.localizedMessage}")
             }
         }
     }

@@ -27,6 +27,7 @@ import com.stripe.stripeterminal.external.models.DiscoveryConfiguration
 import com.stripe.stripeterminal.external.models.Reader
 import com.stripe.stripeterminal.external.models.TerminalException
 import com.swiftcause.swiftcause_android.data.model.DonationMetaData
+import com.swiftcause.swiftcause_android.data.remote.logDebugStep
 import com.swiftcause.swiftcause_android.data.repository.PaymentRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -43,7 +44,6 @@ class PaymentViewModel @Inject constructor(
     private val repository: PaymentRepository,
     @ApplicationContext private val applicationContext: Context
 ) : ViewModel() {
-    val sessionId = UUID.randomUUID().toString()
 
     private val BUSINESS_LOCATION_ID = "tml_GIgICwZfMOuFTJ"
     private val _uiState = MutableStateFlow<PaymentUiState>(PaymentUiState.Idle)
@@ -87,6 +87,8 @@ class PaymentViewModel @Inject constructor(
             object : DiscoveryListener {
                 override fun onUpdateDiscoveredReaders(readers: List<Reader>) {
                     val tapToPayReaders = readers.filter { it.deviceType == DeviceType.TAP_TO_PAY_DEVICE }
+                    logDebugStep("Discovered ${readers.size} readers")
+                    logDebugStep("Found ${tapToPayReaders.size} TTP readers")
 
                     if (tapToPayReaders.isNotEmpty() && Terminal.getInstance().connectedReader == null) {
                         connectToTapToPayReader(tapToPayReaders.first())
@@ -114,6 +116,7 @@ class PaymentViewModel @Inject constructor(
             tapToPayReaderListener = object : TapToPayReaderListener {
                 override fun onDisconnect(reason: DisconnectReason) {
                     Log.d("TapToPay", "Reader disconnected: ${reason.name}")
+                    logDebugStep("Reader disconnected: ${reason.name}")
                     _tapToPayState.value = TapToPayState.Disconnected(reason.name)
                 }
 
@@ -123,17 +126,20 @@ class PaymentViewModel @Inject constructor(
                     reason: DisconnectReason
                 ) {
                     Log.d("TapToPay", "Reconnection started due to: ${reason.name}")
+                    logDebugStep("Reconnection started due to: ${reason.name}")
                     _tapToPayState.value = TapToPayState.Reconnecting
                     // You can store cancelReconnect if you want to cancel reconnection later
                 }
 
                 override fun onReaderReconnectSucceeded(reader: Reader) {
                     Log.d("TapToPay", "Reconnection succeeded")
+                    logDebugStep("Reconnection succeeded")
                     _tapToPayState.value = TapToPayState.Ready
                 }
 
                 override fun onReaderReconnectFailed(reader: Reader) {
                     Log.e("TapToPay", "Reconnection failed")
+                    logDebugStep("Reconnection failed")
                     _tapToPayState.value = TapToPayState.Error("Reconnection failed")
                 }
             }
@@ -162,10 +168,12 @@ class PaymentViewModel @Inject constructor(
         discoveryCancelable?.cancel(object : Callback {
             override fun onSuccess() {
                 Log.d("TapToPay", "Discovery cancelled successfully")
+                logDebugStep("Discovery cancelled successfully")
                 discoveryCancelable = null
             }
             override fun onFailure(e: TerminalException) {
                 Log.e("TapToPay", "Failed to cancel discovery: ${e.errorMessage}")
+                logDebugStep("Failed to cancel discovery: ${e.errorMessage}")
             }
         })
     }
@@ -248,24 +256,6 @@ class PaymentViewModel @Inject constructor(
         fetchedDetails = false;
     }
 
-    fun logDebugStep(step: String) {
-        val debugLog = hashMapOf(
-            "step" to step,
-            "timestamp" to FieldValue.serverTimestamp(),
-            "sessionID" to sessionId
-
-        )
-
-        FirebaseFirestore.getInstance()
-            .collection("debug_logs")
-            .add(debugLog)
-            .addOnSuccessListener {
-                Log.d("DebugLogger", "Logged step: $step")
-            }
-            .addOnFailureListener { e ->
-                Log.e("DebugLogger", "Failed to log: $step", e)
-            }
-    }
 
 }
 sealed class TapToPayState {
