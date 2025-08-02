@@ -65,7 +65,7 @@ fun CampaignListScreen(
             .padding(vertical = 5.dp, horizontal = 5.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Heading(authViewModel, onLogoutRedirect)
+        Heading(navController, authViewModel, onLogoutRedirect)
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -181,7 +181,7 @@ fun CampaignCard(
 
 
 @Composable
-fun Heading(authViewModel: AuthViewModel, onLogoutRedirect: () -> Unit) {
+fun Heading(navController: NavController, authViewModel: AuthViewModel, onLogoutRedirect: () -> Unit) {
     val authState by authViewModel.authUiState.collectAsState()
     val context = LocalContext.current
 
@@ -196,7 +196,9 @@ fun Heading(authViewModel: AuthViewModel, onLogoutRedirect: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text("Welcome, ${user?.displayName ?: user?.email}!")
-                Button(onClick = { authViewModel.signOut(context) }) {
+                Button(onClick = {
+                    authViewModel.signOut(context)
+                }) {
                     Text("Sign Out")
                 }
             }

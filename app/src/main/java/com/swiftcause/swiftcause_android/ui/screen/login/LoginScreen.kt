@@ -4,17 +4,23 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -34,6 +40,11 @@ fun LoginScreen(
     val signInLauncher = rememberLauncherForActivityResult(FirebaseAuthUIActivityResultContract()) { res ->
         authViewModel.handleAuthResult(res.idpResponse, res.resultCode)
     }
+    LaunchedEffect(authState) {
+        if (authState == AuthUiState.Unauthenticated){
+            authViewModel.launchFirebaseAuthUI(signInLauncher)
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
@@ -41,22 +52,20 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         when (authState) {
-            AuthUiState.Unauthenticated -> {
-                Text("Welcome to SwiftCause")
-                Button(onClick = {
-                    authViewModel.launchFirebaseAuthUI(signInLauncher)
-                }) {
-                    Text("Login/SignUp")
-                }
+            AuthUiState.Unauthenticated -> {}
+            AuthUiState.Authenticating -> {}
+            is AuthUiState.Error -> {
+                Text(
+                    text = "Login is required to continue using SwiftCause.",
+                    style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center
+                )
 
-                if (authState is AuthUiState.Error) {
-                    val errorMessage = (authState as AuthUiState.Error).message
-                    Text("Error: $errorMessage", color = androidx.compose.ui.graphics.Color.Red)
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Button(onClick = {authViewModel.setUnauthenticated()}, modifier = Modifier.fillMaxWidth()) {
+                    Text("Retry Login")
                 }
-            }
-            AuthUiState.Authenticating -> {
-                CircularProgressIndicator()
-                Text("Authenticating...")
             }
             is AuthUiState.Authenticated -> {
                 navController.navigate(Routes.campaignListScreen){
@@ -64,9 +73,10 @@ fun LoginScreen(
                         inclusive = true
                     }
                 }
-//                Toast.makeText(context, "Logged in successfully!", Toast.LENGTH_SHORT).show()
             }
-            else -> Toast.makeText(context, "Some error occurred!", Toast.LENGTH_SHORT).show()
+            else -> {
+                Toast.makeText(context, "Some error occurred!", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }

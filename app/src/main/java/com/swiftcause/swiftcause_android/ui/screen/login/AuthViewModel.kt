@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
+import com.swiftcause.swiftcause_android.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,6 +43,8 @@ class AuthViewModel @Inject constructor(
         val signInIntent = AuthUI.getInstance()
             .createSignInIntentBuilder()
             .setAvailableProviders(providers).setCredentialManagerEnabled(false)
+            .setTheme(R.style.MyFirebaseUITheme)
+            .setLogo(R.drawable.background_curved)
             .build()
 
         launcher.launch(signInIntent)
@@ -62,7 +65,7 @@ class AuthViewModel @Inject constructor(
             // sign-in flow using the back button. Otherwise check
             // response.getError().getErrorCode() and handle the error.
             val error = result?.error
-            _authUiState.value = AuthUiState.Error(error?.message ?: "Sign-in cancelled or unknown error.")
+            _authUiState.value = AuthUiState.Error(error?.message ?: "Sign-in cancelled.")
         }
     }
     fun signOut(context : Context) {
@@ -71,12 +74,15 @@ class AuthViewModel @Inject constructor(
                 .signOut(context)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        _authUiState.value = AuthUiState.Unauthenticated
+                        setUnauthenticated()
                     } else {
                         _authUiState.value = AuthUiState.Error("Sign out failed: ${task.exception?.message}")
                     }
                 }
         }
+    }
+    fun setUnauthenticated(){
+        _authUiState.value = AuthUiState.Unauthenticated;
     }
 
 
