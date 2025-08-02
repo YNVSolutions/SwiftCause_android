@@ -52,23 +52,8 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         when (authState) {
-            AuthUiState.Unauthenticated -> {
-//                Text("Welcome to SwiftCause")
-//                Button(onClick = {
-//                    authViewModel.launchFirebaseAuthUI(signInLauncher)
-//                }) {
-//                    Text("Login/SignUp")
-//                }
-//
-//                if (authState is AuthUiState.Error) {
-//                    val errorMessage = (authState as AuthUiState.Error).message
-//                    Text("Error: $errorMessage", color = androidx.compose.ui.graphics.Color.Red)
-//                }
-            }
-            AuthUiState.Authenticating -> {
-//                CircularProgressIndicator()
-//                Text("Authenticating...")
-            }
+            AuthUiState.Unauthenticated -> {}
+            AuthUiState.Authenticating -> {}
             is AuthUiState.Error -> {
                 Text(
                     text = "Login is required to continue using SwiftCause.",
@@ -88,7 +73,6 @@ fun LoginScreen(
                         inclusive = true
                     }
                 }
-//                Toast.makeText(context, "Logged in successfully!", Toast.LENGTH_SHORT).show()
             }
             else -> {
                 Toast.makeText(context, "Some error occurred!", Toast.LENGTH_SHORT).show()
