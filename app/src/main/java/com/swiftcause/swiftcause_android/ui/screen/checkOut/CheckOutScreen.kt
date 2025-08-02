@@ -1,8 +1,12 @@
 package com.swiftcause.swiftcause_android.ui.screen.checkOut
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.content.pm.PackageManager
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,7 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.swiftcause.swiftcause_android.data.remote.retrofit.PaymentViewModel
+import com.swiftcause.swiftcause_android.ui.screen.checkOut.PaymentViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,8 +46,10 @@ import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.modifier.modifierLocalProvider
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import com.stripe.android.paymentsheet.PaymentSheet
 import com.stripe.android.paymentsheet.PaymentSheetResultCallback
+
 import com.swiftcause.swiftcause_android.ui.navigation.Routes
 import com.swiftcause.swiftcause_android.ui.shared.SharedViewModel
 import kotlin.math.roundToInt
@@ -77,15 +83,35 @@ fun CheckOutScreen(
         PaymentSheet.Builder(paymentResultCallback)
     }.build()
 
-    val enteredAmount = amount.toDoubleOrNull() ?: 0.0;
-    val pounds = enteredAmount * 100;
-    LaunchedEffect(Unit) {
-        viewModel.initiatePayment(amount = pounds.roundToInt(), currency = "gbp", campId = campId)
+    val enteredAmount = amount.toDoubleOrNull() ?: 0.0
+    val pounds = enteredAmount * 100
+
+    val initTapToPay by viewModel.initTapToPay.collectAsState()
+
+    if (initTapToPay) {
+        LocationPermissionHandler(
+            onPermissionGranted = {
+                viewModel.initTapToPayTerminal()
+                viewModel.initTapToPay.value = false
+            },
+            onPermissionDenied = {
+                viewModel.initTapToPay.value = false
+            }
+        )
+
     }
 
 
-
     LaunchedEffect(uiState) {
+        if (checkoutButtonClicked && uiState is PaymentUiState.ReadyForPayment){
+            val state = uiState as PaymentUiState.ReadyForPayment
+            showStripeUI(
+                clientSecret = state.clientSecret,
+                uiState = state,
+                paymentSheet = paymentSheet
+            )
+            checkoutButtonClicked = false;
+        }
         when (uiState) {
 
             is PaymentUiState.Success -> {
@@ -118,27 +144,41 @@ fun CheckOutScreen(
                 viewModel.resetPaymentFlow() // Reset UI state after cancellation
             }
 
-            else -> { /* Idle or Loading, no action needed here */
+            else -> { // Idle or Loading, no action needed here
             }
         }
     }
     Scaffold(
         bottomBar = {
-            Button(
-                modifier = Modifier.fillMaxWidth()
-                .padding(16.dp),
-                onClick = {
-                    checkoutButtonClicked = true
-                    showStripeUI(
-                        clientSecret = clientSecret,
-                        uiState = uiState,
-                        paymentSheet = paymentSheet
-                    );
+            Column {
 
-                },
-                enabled = (clientSecret != null)
-            ) {
-                Text("Proceed to payment")
+
+                Button(
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(16.dp),
+                    onClick = {
+//                        checkoutButtonClicked = true
+                        // check if the location permission is there and if not then request it.
+                        viewModel.onTapToPayClicked()
+                    },
+//                    enabled = (clientSecret != null)
+                ) {
+                    Text("Pay with Tap to Pay")
+                }
+                Button(
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(16.dp),
+                    onClick = {
+                        checkoutButtonClicked = true
+                        viewModel.initiatePayment(amount = pounds.roundToInt(), currency = "gbp", campId = campId)
+
+
+                    },
+                    enabled = uiState !is PaymentUiState.Loading && uiState !is PaymentUiState.ReadyForPayment
+//                    enabled = (clientSecret != null)
+                ) {
+                    Text("Pay with card")
+                }
             }
         }
     ) { innerPadding ->
@@ -224,3 +264,37 @@ fun CheckOutScreen(
             }
         }
     }
+
+@Composable
+fun LocationPermissionHandler(
+    onPermissionGranted: () -> Unit,
+    onPermissionDenied: () -> Unit
+) {
+    val context = LocalContext.current
+    val permissionGranted = remember {
+        ContextCompat.checkSelfPermission(
+            context, Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+//            Toast.makeText(context, "Location permission is provided", Toast.LENGTH_LONG).show()
+            onPermissionGranted()
+        } else {
+            Toast.makeText(context, "Location permission is required for Tap to Pay", Toast.LENGTH_LONG).show()
+            onPermissionDenied()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        if (permissionGranted) {
+//            Toast.makeText(context, "Location permission is provided", Toast.LENGTH_LONG).show()
+            onPermissionGranted()
+        } else {
+            launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+    }
+}
