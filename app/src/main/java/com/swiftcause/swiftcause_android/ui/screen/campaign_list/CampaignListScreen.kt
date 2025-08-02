@@ -198,10 +198,6 @@ fun Heading(navController: NavController, authViewModel: AuthViewModel, onLogout
                 Text("Welcome, ${user?.displayName ?: user?.email}!")
                 Button(onClick = {
                     authViewModel.signOut(context)
-//                    navController.navigate(Routes.loginScreen) {
-//                        popUpTo(0) // Clears entire stack
-//                        launchSingleTop = true
-//                    }
                 }) {
                     Text("Sign Out")
                 }
