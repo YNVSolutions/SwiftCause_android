@@ -15,4 +15,10 @@
     <color name="on_secondary">#000000</color>
     <color name="light_gray">#F5F5F5</color>
     <color name="dark_gray">#333333</color>
+    <color name="charity_primary">#4CAF50</color> <!-- green for growth/hope -->
+    <color name="charity_on_primary">#FFFFFF</color>
+    <color name="charity_secondary">#FFD54F</color> <!-- yellow-gold for warmth -->
+    <color name="charity_text">#212121</color>
+    <color name="charity_bg">#FAFAFA</color>
+
 </resources>

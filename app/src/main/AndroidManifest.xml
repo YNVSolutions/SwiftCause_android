@@ -30,6 +30,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+<!--        <activity-->
+<!--            android:name="com.firebase.ui.auth.ui.idp.AuthMethodPickerActivity"-->
+<!--            android:theme="@style/MyFirebaseUITheme"-->
+<!--            tools:replace="android:theme" />-->
     </application>
 
 </manifest>

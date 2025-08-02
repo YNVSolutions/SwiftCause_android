@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="MyFirebaseUITheme" parent="Theme.Material3.DayNight">
+        MyFirebaseUITheme" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- App background -->
+        <item name="android:windowBackground">@drawable/bg_auth</item>
+
+        <!-- Primary colors -->
+        <item name="colorPrimary">@color/charity_primary</item>
+        <item name="colorOnPrimary">@color/charity_on_primary</item>
+        <item name="colorSecondary">@color/charity_secondary</item>
+        <item name="android:statusBarColor">@android:color/black</item>
+
+
+        <!--         Firebase UI-specific tweaks -->
+        <item name="android:textColor">@color/charity_text</item>
+        <item name="android:buttonStyle">@style/FirebaseAuthButtonStyle</item>
+    </style>
+
+    <!-- Optional: Customize buttons -->
+    <style name="FirebaseAuthButtonStyle" parent="Widget.Material3.Button">
+        <item name="android:backgroundTint">@color/charity_primary</item>
+        <item name="android:textColor">@color/charity_on_primary</item>
+<!--        <item name="android:cornerRadius">8dp</item>-->
+    </style>
+
+</resources>
